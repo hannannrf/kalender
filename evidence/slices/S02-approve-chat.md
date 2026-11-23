@@ -103,7 +103,7 @@ Found and fixed during the manual check: approving a Chat whose messages are all
 
 ## 8. Integrate
 
-PR #3 merged into `main` with a merge commit, tagged `S02-accepted`; CI on `main` is Gate 4. Production applies migration 002 to the Neon `production` branch during the build.
+PR #3 merged into `main` with a merge commit, tagged `S02-accepted`; CI on `main` is Gate 4. Production applies migration 002 to the Neon `production` branch during the build. Checked after the merge: CI on `main` passed; the production build applied migration 002; on https://kalender-tan-eta.vercel.app `/api/health` answers `{"status":"ok","db":"ok"}` and `/api/chats` answers 401 when signed out.
 
 ## 9. Context updated
 

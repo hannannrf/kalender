@@ -1,5 +1,5 @@
 // The only code that touches approved_chats (ADR-005). Every function takes userId first and filters by it.
-import type { Pool } from 'pg';
+import type { Db } from '../../shared/db';
 
 export type ChatRow = {
   id: string;
@@ -12,7 +12,7 @@ export type ChatRow = {
 
 const COLUMNS = 'id, name, colour, look_back_days, approved_at, last_upload_at';
 
-export async function listActive(db: Pool, userId: string): Promise<ChatRow[]> {
+export async function listActive(db: Db, userId: string): Promise<ChatRow[]> {
   const res = await db.query<ChatRow>(
     `select ${COLUMNS} from approved_chats where user_id = $1 and revoked_at is null order by approved_at desc`,
     [userId],
@@ -32,7 +32,7 @@ export type NewChat = {
 };
 
 /** Inserts with the first Chat colour not used by the User's other active Chats; undefined if the name is taken. */
-export async function insertApproved(db: Pool, userId: string, chat: NewChat): Promise<ChatRow | undefined> {
+export async function insertApproved(db: Db, userId: string, chat: NewChat): Promise<ChatRow | undefined> {
   const res = await db.query<ChatRow>(
     `insert into approved_chats
        (user_id, name, name_key, colour, look_back_days, date_order, approved_at, start_point, read_up_to, boundary, last_upload_at)

@@ -1,0 +1,76 @@
+.group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.chatName {
+  font-size: var(--text-lg);
+  overflow-wrap: anywhere;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-1);
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border-left: var(--bar-width) solid;
+  padding: var(--space-3) var(--space-4);
+}
+
+.title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.when {
+  font-variant-numeric: tabular-nums;
+}
+
+.place {
+  color: var(--muted);
+  font-size: var(--text-md);
+  overflow-wrap: anywhere;
+}
+
+/* Uncertain value: mark plus the "Check this" chip, never colour alone (ui-direction.md). */
+.mark {
+  background: var(--uncertain-mark);
+  color: var(--uncertain-ink);
+  border-radius: 4px;
+  padding: 0 var(--space-1);
+}
+
+.chip {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  padding: 2px var(--space-2) 2px var(--space-1);
+  border-radius: 999px;
+  background: var(--check-bg);
+  color: var(--check-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.chip svg {
+  width: 16px;
+  height: 16px;
+}
+
+.problem {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+  font-weight: 500;
+}

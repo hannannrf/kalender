@@ -3,7 +3,8 @@ import { BottomNav } from './components/BottomNav';
 import { EmptyState } from './components/EmptyState';
 import { AuthPage } from './pages/AuthPage';
 import { ChatsPage } from './pages/ChatsPage';
-import { EventsPage, InboxPage, SettingsPage } from './pages/Pages';
+import { InboxPage } from './pages/InboxPage';
+import { EventsPage, SettingsPage } from './pages/Pages';
 import pageStyles from './pages/Page.module.css';
 import { useSession } from './session';
 

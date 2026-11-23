@@ -1,0 +1,10 @@
+Metric                         Result           Target   Pass  Failing IDs
+M1 recall E-EN                 20/20 = 100%     ≥ 90%    PASS  
+M1 recall E-RU                 20/20 = 100%     ≥ 90%    PASS  
+M2 correct date + time         40/40 = 100%     ≥ 90%    PASS  
+M3 ambiguous detected          20/20 = 100%     ≥ 90%    PASS  
+M3 uncertainty flagged         20/20 = 100%     100%     PASS  
+M4 false suggestions           0/20             ≤ 4      PASS  
+M4 past-reference detected     0/8              0        PASS  
+
+FR-05 detection: ACCEPTED
