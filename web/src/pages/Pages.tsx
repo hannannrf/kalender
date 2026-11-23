@@ -4,17 +4,6 @@ import { EmptyState } from '../components/EmptyState';
 import { useSession } from '../session';
 import styles from './Page.module.css';
 
-export function InboxPage() {
-  return (
-    <main className={styles.page}>
-      <h1 className={styles.title}>Inbox</h1>
-      <EmptyState title="Nothing to check">
-        Upload a Chat Export from Chats. The Events Kalender finds wait here until you check them.
-      </EmptyState>
-    </main>
-  );
-}
-
 export function EventsPage() {
   return (
     <main className={styles.page}>

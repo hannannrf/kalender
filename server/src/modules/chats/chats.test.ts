@@ -34,7 +34,7 @@ describe.skipIf(!hasDb)('chats (FR-02, BR-02, BR-15)', () => {
     const { userId } = await signedIn();
     const now = new Date(pktToUtc(2026, 10, 19, 10, 25).getTime() + 40_000);
     const result = await approveChat(db(), userId, { bytes: sample(SE3D), filename: SE3D }, { confirmedName: 'SE-3D Class', lookBackDays: 7 }, now);
-    expect(result).toMatchObject({ messagesRead: 6, detectedEvents: 0, noNewMessages: false, chat: { name: 'SE-3D Class', colour: 1 } });
+    expect(result).toMatchObject({ messagesRead: 6, detectedEvents: 2, noNewMessages: false, chat: { name: 'SE-3D Class', colour: 1 } });
     const row = await db().query('select start_point, read_up_to from approved_chats where user_id = $1', [userId]);
     expect(row.rows[0].start_point).toEqual(pktToUtc(2026, 10, 12, 10, 25));
     expect(row.rows[0].read_up_to).toEqual(pktToUtc(2026, 10, 19, 10, 25));

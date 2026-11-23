@@ -1,6 +1,8 @@
 // Approve and list Chats (FR-02, BR-02, BR-15). File bytes live only in this call's memory (BR-05).
 import type { Pool } from 'pg';
 import { parseExport, selectEligible, type DateOrder } from '../ingestion';
+import * as events from '../events';
+import { withTransaction } from '../../shared/db';
 import { startOfMinute } from '../../shared/time';
 import * as repo from './repository';
 
@@ -49,22 +51,24 @@ export async function approveChat(
   const startPoint = startOfMinute(new Date(now.getTime() - options.lookBackDays * 24 * 60 * 60 * 1000));
   const selection = selectEligible(parsed.messages, { startPoint, readUpTo: null, boundary: {} });
 
-  // shortcut: S03 passes selection.eligible to events.ingestMessages in this same transaction; until then
-  // messages are counted as read and dropped, as BR-05 requires for messages with no Event.
-  const row = await repo.insertApproved(db, userId, {
-    name: options.confirmedName,
-    nameKey: parsed.fileKey,
-    lookBackDays: options.lookBackDays,
-    dateOrder: parsed.dateOrder,
-    approvedAt: now,
-    startPoint,
-    readUpTo: selection.readUpTo,
-    boundary: selection.boundary,
-  });
-  if (!row) return { refused: 'DUPLICATE_CHAT', message: 'This Chat is already approved.' };
+  // One transaction: the pointers move only if the Detected Events are stored too (architecture section 6.3).
+  return withTransaction(db, async (tx) => {
+    const row = await repo.insertApproved(tx, userId, {
+      name: options.confirmedName,
+      nameKey: parsed.fileKey,
+      lookBackDays: options.lookBackDays,
+      dateOrder: parsed.dateOrder,
+      approvedAt: now,
+      startPoint,
+      readUpTo: selection.readUpTo,
+      boundary: selection.boundary,
+    });
+    if (!row) return { refused: 'DUPLICATE_CHAT', message: 'This Chat is already approved.' } as const;
 
-  const messagesRead = selection.eligible.length;
-  return { chat: view(row), messagesRead, detectedEvents: 0, noNewMessages: messagesRead === 0 };
+    const detectedEvents = await events.ingestMessages(userId, { id: row.id, name: row.name, colour: row.colour }, selection.eligible, tx, now);
+    const messagesRead = selection.eligible.length;
+    return { chat: view(row), messagesRead, detectedEvents, noNewMessages: messagesRead === 0 };
+  });
 }
 
 export async function listChats(db: Pool, userId: string): Promise<ChatView[]> {

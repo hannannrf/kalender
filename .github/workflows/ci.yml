@@ -34,4 +34,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      # NFR-05 parity: score the detector output written by the gate test with the reference scorer, unchanged.
+      - name: Score detection with evaluate.py
+        run: |
+          python3 fixtures/detection/evaluate.py fixtures/detection/detection_test_set.csv server/test/out/detector_output.csv | tee nfr05.txt
+          grep -q "FR-05 detection: ACCEPTED" nfr05.txt
       - run: npm run build
