@@ -18,9 +18,15 @@ describe('GET /api/health', () => {
     expect(res.body).toEqual({ status: 'ok', db: 'ok' });
   });
 
-  it('answers unknown /api paths with a JSON 404', async () => {
+  it('answers other /api paths with 401 when signed out', async () => {
     const res = await request(app).get('/api/nope');
-    expect(res.status).toBe(404);
-    expect(res.body).toEqual({ error: 'not_found' });
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ error: 'not_signed_in' });
+  });
+
+  it.skipIf(process.env.DATABASE_URL)('answers identity routes with 503 when there is no database', async () => {
+    const res = await request(app).post('/api/auth/sign-in').send({ email: 'mahd@example.com', password: 'kal-5-baje' });
+    expect(res.status).toBe(503);
+    expect(res.body).toEqual({ error: 'database_not_configured' });
   });
 });

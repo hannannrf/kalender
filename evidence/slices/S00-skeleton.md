@@ -55,7 +55,7 @@ Output: `evidence/test-runs/S00-2026-11-23.txt`.
 |---|---|
 | ![Inbox](S00/inbox-mobile.jpg) | ![Settings](S00/settings-mobile.jpg) |
 
-Not yet verified: the Vercel preview deployment (the Vercel project is not linked yet, open issue O-2).
+Production check after the merge (23 Nov 2026): `vercel deploy --prod` to https://kalender-tan-eta.vercel.app, function `api/index` in region iad1. `GET /api/health` returned `{"status":"ok","db":"ok"}` (Neon production branch), `GET /api/nope` returned the JSON 404, and repository paths such as `/AGENTS.md` return the PWA page, not the file.
 
 ## 7. Human decision
 

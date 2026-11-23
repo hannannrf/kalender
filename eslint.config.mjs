@@ -10,6 +10,11 @@ const noDeepModuleImports = {
   message: 'Import another module only through its index.ts (AGENTS.md section 3).',
 };
 
+const noIdentityImports = {
+  regex: String.raw`^\.\./identity(/|$)`,
+  message: 'Modules never import identity; read req.userId through shared/http (AGENTS.md section 4).',
+};
+
 export default tseslint.config(
   { ignores: ['**/dist/**', '**/node_modules/**', 'fixtures/**', 'coverage/**'] },
   js.configs.recommended,
@@ -19,7 +24,14 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
   {
+    rules: { '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }] },
+  },
+  {
     files: ['server/src/modules/**/*.ts'],
+    rules: { 'no-restricted-imports': ['error', { patterns: [noDeepModuleImports, noIdentityImports] }] },
+  },
+  {
+    files: ['server/src/modules/identity/**/*.ts'],
     rules: { 'no-restricted-imports': ['error', { patterns: [noDeepModuleImports] }] },
   },
   {

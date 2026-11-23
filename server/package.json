@@ -3,9 +3,11 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/dev.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "migrate": "tsx src/migrate.ts"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "express": "^5.3.0",
     "pg": "^8.23.1"
   },
