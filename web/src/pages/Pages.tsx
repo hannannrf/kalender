@@ -62,7 +62,7 @@ export function SettingsPage() {
       <h1 className={styles.title}>Settings</h1>
       <section className={styles.rows} aria-labelledby="account-heading">
         <h2 id="account-heading" className={styles.sectionTitle}>Account</h2>
-        <div className={styles.row}>
+        <div className={`${styles.row} ${styles.stacked}`}>
           <span className={styles.label}>Signed in as</span>
           <span className={styles.value}>{session.status === 'signed-in' ? session.account.email : ''}</span>
         </div>

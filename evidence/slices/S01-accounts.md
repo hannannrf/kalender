@@ -75,14 +75,21 @@ Process note: Vercel blocked the first S01 preview because the commits were auth
 
 ## 6. Checks
 
-- Local: 24 passed, 11 skipped (no local database). Lint, typecheck, build clean.
+- Local without a database: 24 passed, 11 skipped. Lint, typecheck, build clean.
+- Local against the Neon `dev` branch: **33 passed, 2 skipped** in 46 s (`evidence/test-runs/S01-2026-11-23-neon-dev.txt`). The first run timed out: Vitest's 5 s default is too short for a remote Neon branch waking from sleep plus bcrypt at cost 12, so `server/vitest.config.ts` now sets a 30 s test timeout.
 - CI on PR #2 (Postgres 17 service): **33 passed, 2 skipped** (the two no-database cases). All 10 identity route tests and 13 EP/BVA domain tests ran. The build step ran the migration again: "applied 0 (none new)", so it is safe to repeat.
 - Deployed preview (https://kalender-n8cxj4vva-hannan-f17c.vercel.app, Neon `dev` branch), driven with `vercel curl` because preview deployments are behind Vercel Authentication: the build log shows `migrate: applied 1 (001_identity_create_users_and_sessions.sql)`; register 201, `/api/me` 200 with the same email, sign-out 204, `/api/me` 401 afterwards, sign-in 200, wrong password 401 with the generic message. The cookie came back HttpOnly and Secure.
 - Manual check of the screens at 375 x 812 (local dev server): the sign-in screen, and the create-account screen with both field errors under their fields.
 
-| Sign in | Create account with field errors |
-|---|---|
-| ![Sign in](S01/sign-in-mobile.jpg) | ![Errors](S01/create-account-errors.jpg) |
+- Signed-in check at 375 x 812 (local API on the Neon `dev` branch): created a test account, landed on the Inbox, opened Settings ("Signed in as" shows the email; Server Online, Database Connected), pressed Sign out, returned to `/sign-in`, and `/api/me` then answered 401.
+
+| Sign in | Create account with field errors | Settings, signed in |
+|---|---|---|
+| ![Sign in](S01/sign-in-mobile.jpg) | ![Errors](S01/create-account-errors.jpg) | ![Settings](S01/settings-signed-in.jpg) |
+
+**Layout fix found during the signed-in check:** at phone width the email sat beside "Signed in as" and broke mid-word across lines. The account row now puts the email under its label (`.stacked` in `Page.module.css`).
+
+**Observed, not fixed:** creating an account took about 8 s on the first request against a sleeping Neon branch (the button shows "Creating account…" meanwhile). Later requests are fast. Neon is in Singapore and the Vercel function in `iad1`; pinning the function region near the database is an open item for the human.
 
 **Bug found during the manual check, fixed in this slice:** when the API was down, the Vite dev proxy answered `/api/me` with the HTML page and status 200, and the PWA treated that as "signed in" (empty email). The same would happen with any HTML answer, such as a Vercel login page. `web/src/api.ts` now refuses any answer that is not JSON, so the app shows "Kalender is not reachable" with Try again. Checked again in the browser after the fix.
 

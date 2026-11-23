@@ -44,6 +44,18 @@
   text-align: right;
 }
 
+/* Long values such as an email go under their label, so they never break beside it. */
+.stacked {
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.stacked .value {
+  text-align: left;
+}
+
 .secondary {
   min-height: var(--target);
   padding: 0 var(--space-4);
