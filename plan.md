@@ -45,7 +45,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 
 | ID | Slice (what the User can do) | FR / BR / NFR | ACs | Depends | Mode | Pri | Day | Lead (proposed) | Status | Gates |
 |---|---|---|---|---|---|---|---|---|---|---|
-| S00 | Walking skeleton: app shell with Kalender tokens loads; `/api/health` answers; test, lint and CI run; deploys to Vercel | infra | – | – | AFK | M | Tue 24 | Abdul Hannan Rauf | In progress | – |
+| S00 | Walking skeleton: app shell with Kalender tokens loads; `/api/health` answers; test, lint and CI run; deploys to Vercel | infra | – | – | AFK | M | Tue 24 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
 | S01 | Create account, sign in and out, see only own data | FR-01, BR-11 | 01.1, 01.2, 02.5 | S00 | HITL | M | Tue 24 | Muhammad Areeb | Planned | – |
 | S02 | Approve a Chat from an Android `.txt` export: preview name, choose Look-back, see messages read; bad files refused | FR-02, BR-01..03, BR-05, BR-15, NFR-01 | 02.1, 02.3 | S01 | HITL | M | Tue 24 | Zain Amjad | Planned | – |
 | S03 | Detected Events appear after upload (English and Roman Urdu rules, Uncertain marks, Needs date) plus the NFR-05 gate | FR-05, BR-12, BR-17, BR-20, BR-21, NFR-05 | 05.1..05.9, 05.12, 05.13 | S02 | HITL | M | Tue 24 | Abdul Hannan Rauf | Planned | – |

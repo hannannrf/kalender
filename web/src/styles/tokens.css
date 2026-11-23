@@ -1,0 +1,41 @@
+/* Single source of design tokens (docs/design/ui-direction.md, D-24). Components use these, never raw hex. */
+:root {
+  --ground: #f3f4f2;
+  --card: #ffffff;
+  --surface: #e8eae6;
+  --line: #e2e4df;
+  --text: #17181a;
+  --muted: #5d6158;
+  --primary: #17181a;
+  --on-primary: #ffffff;
+  --badge: #c2410c;
+  --uncertain-mark: #fde68a;
+  --uncertain-ink: #3b2c00;
+  --check-bg: #fff9e0;
+  --check-ink: #5a4300;
+  --danger: #b42318;
+  --chat-manual: #6b6f76;
+
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --text-sm: 0.8125rem;
+  --text-md: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-sheet: 22px;
+  --bar-width: 5px;
+  --target: 44px;
+  --content-max: 640px;
+}

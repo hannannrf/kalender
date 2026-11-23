@@ -1,0 +1,32 @@
+.nav {
+  position: fixed;
+  inset: auto 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  padding: var(--space-1) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom));
+}
+
+.tab {
+  min-height: calc(var(--target) + var(--space-3));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--radius-control);
+}
+
+.active {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.active svg {
+  stroke-width: 2.25;
+}
