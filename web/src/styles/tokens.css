@@ -14,7 +14,17 @@
   --check-bg: #fff9e0;
   --check-ink: #5a4300;
   --danger: #b42318;
+  --danger-bg: #fdecea;
   --chat-manual: #6b6f76;
+  /* Approved Chat palette, assigned in approval order (architecture section 8). */
+  --chat-1: #2457d6;
+  --chat-2: #c2410c;
+  --chat-3: #c2255c;
+  --chat-4: #0f766e;
+  --chat-5: #7c3aed;
+  --chat-6: #a16207;
+  --chat-7: #0e7490;
+  --chat-8: #4d7c0f;
 
   --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
   --font-body: 'DM Sans', system-ui, sans-serif;

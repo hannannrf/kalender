@@ -9,7 +9,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "npm run build -w web",
+    "build": "npm run migrate -w server && npm run build -w web",
     "typecheck": "tsc -p server --noEmit && tsc -p web --noEmit && tsc -p api --noEmit",
     "lint": "eslint .",
     "test": "vitest run --root server"

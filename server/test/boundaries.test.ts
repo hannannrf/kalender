@@ -20,6 +20,10 @@ describe('module boundary lint rule', () => {
     expect(await errors("import { a } from '../../shared/db';\nimport { b } from './domain/rules';\nexport const x = [a, b];\n")).toBe(0);
   });
 
+  it('rejects importing identity from another module', async () => {
+    expect(await errors("import { a } from '../identity';\nexport const x = a;\n")).toBe(1);
+  });
+
   it('rejects importing a file inside another module', async () => {
     expect(await errors("import { a } from '../events/service';\nexport const x = a;\n")).toBe(1);
   });

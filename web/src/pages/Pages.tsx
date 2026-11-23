@@ -1,6 +1,7 @@
 // S00 placeholder screens. Each grows into its own file in the slice that fills it.
 import { useEffect, useState } from 'react';
 import { EmptyState } from '../components/EmptyState';
+import { useSession } from '../session';
 import styles from './Page.module.css';
 
 export function InboxPage() {
@@ -42,7 +43,9 @@ const dbText: Record<string, string> = {
 };
 
 export function SettingsPage() {
+  const session = useSession();
   const [health, setHealth] = useState<Health | 'error' | undefined>();
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     fetch('/api/health')
@@ -57,6 +60,26 @@ export function SettingsPage() {
   return (
     <main className={styles.page}>
       <h1 className={styles.title}>Settings</h1>
+      <section className={styles.rows} aria-labelledby="account-heading">
+        <h2 id="account-heading" className={styles.sectionTitle}>Account</h2>
+        <div className={`${styles.row} ${styles.stacked}`}>
+          <span className={styles.label}>Signed in as</span>
+          <span className={styles.value}>{session.status === 'signed-in' ? session.account.email : ''}</span>
+        </div>
+        <div className={styles.row}>
+          <button
+            type="button"
+            className={styles.secondary}
+            disabled={signingOut}
+            onClick={() => {
+              setSigningOut(true);
+              session.signOut().catch(() => setSigningOut(false));
+            }}
+          >
+            {signingOut ? 'Signing out…' : 'Sign out'}
+          </button>
+        </div>
+      </section>
       <section className={styles.rows} aria-label="System status" aria-live="polite">
         <div className={styles.row}>
           <span className={styles.label}>Server</span>

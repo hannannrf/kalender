@@ -10,6 +10,17 @@ export function getPool(): Pool | undefined {
   return pool;
 }
 
+export class DatabaseNotConfigured extends Error {
+  name = 'DatabaseNotConfigured';
+}
+
+/** For routes that cannot work without a database; the app error handler turns this into a 503. */
+export function db(): Pool {
+  const p = getPool();
+  if (!p) throw new DatabaseNotConfigured();
+  return p;
+}
+
 export async function closePool(): Promise<void> {
   await pool?.end();
   pool = undefined;

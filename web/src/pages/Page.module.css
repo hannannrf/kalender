@@ -32,3 +32,55 @@
 .label {
   color: var(--muted);
 }
+
+.sectionTitle {
+  font-size: var(--text-lg);
+  padding-top: var(--space-4);
+}
+
+.value {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+/* Long values such as an email go under their label, so they never break beside it. */
+.stacked {
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.stacked .value {
+  text-align: left;
+}
+
+.secondary {
+  min-height: var(--target);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.textButton {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
