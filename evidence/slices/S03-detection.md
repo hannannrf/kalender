@@ -98,3 +98,5 @@ Known limits (each closed by a later slice):
 ![Inbox at 375 x 812](S03/inbox-375.jpg)
 
 Found and fixed during the manual check: "agle hafte presentation hai" was titled "Hafte presentation". Period words (week, hafte, mahine, ...) are now title stop words, and AC-05.6 checks the title "Presentation".
+- CI on PR #4 (Postgres 17): green, including the new step that scores the gate output with the unchanged `evaluate.py` ("FR-05 detection: ACCEPTED").
+- Deployed preview (https://kalender-9rp8pduxt-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new test account: approving a 3-message synthetic export 201 with `messagesRead` 3 and `detectedEvents` 2; `GET /api/detected-events` 200 with "Viva" Tue 24 Nov 17:00, Room 12, time Uncertain (U1) and "Quiz" Thu 26 Nov 09:00; signed out 401. The build applied migration 003 to Neon `dev`.
