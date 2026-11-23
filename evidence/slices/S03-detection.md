@@ -100,3 +100,15 @@ Known limits (each closed by a later slice):
 Found and fixed during the manual check: "agle hafte presentation hai" was titled "Hafte presentation". Period words (week, hafte, mahine, ...) are now title stop words, and AC-05.6 checks the title "Presentation".
 - CI on PR #4 (Postgres 17): green, including the new step that scores the gate output with the unchanged `evaluate.py` ("FR-05 detection: ACCEPTED").
 - Deployed preview (https://kalender-9rp8pduxt-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new test account: approving a 3-message synthetic export 201 with `messagesRead` 3 and `detectedEvents` 2; `GET /api/detected-events` 200 with "Viva" Tue 24 Nov 17:00, Room 12, time Uncertain (U1) and "Quiz" Thu 26 Nov 09:00; signed out 401. The build applied migration 003 to Neon `dev`.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 23 Nov 2026 ("Accept, merge and tag"). Reason: criteria S03-1 to S03-16 pass in CI, against Neon `dev`, on the deployed preview and in the manual phone-size check; the NFR-05 gate passes on every metric and the reference scorer agrees; the known limits (review and confirm in S04, Chat update in S05, expiry jobs in S07) are accepted.
+
+## 8. Integrate
+
+PR #4 merged into `main` with a merge commit, tagged `S03-accepted`; CI on `main` is Gate 4. Production applies migration 003 to the Neon `production` branch during the build.
+
+## 9. Context updated
+
+`plan.md` v04 (copy in `docs/plan-history/plan-v04.md`): S03 Accepted. Row 6 added to `evidence/workflow-evidence-log.md`.
