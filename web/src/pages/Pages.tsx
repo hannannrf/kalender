@@ -24,17 +24,6 @@ export function EventsPage() {
   );
 }
 
-export function ChatsPage() {
-  return (
-    <main className={styles.page}>
-      <h1 className={styles.title}>Chats</h1>
-      <EmptyState title="No Approved Chats yet">
-        In WhatsApp, open a group, choose Export chat, then Without media. You will upload that file here.
-      </EmptyState>
-    </main>
-  );
-}
-
 type Health = { status: string; db: string };
 const dbText: Record<string, string> = {
   ok: 'Connected',
