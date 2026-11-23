@@ -1,0 +1,81 @@
+id,group,lang,message,event,date,time,needs_date,uncertain,rule
+EN01,E-EN,EN,Meeting tomorrow at 3pm in Room 4,Y,2026-10-20,15:00,N,,BR-12 tomorrow
+EN02,E-EN,EN,Lab report due Friday,Y,2026-10-23,ALLDAY,N,,BR-12 day name; BR-07
+EN03,E-EN,EN,OOP quiz on 22/10 at 9:30am,Y,2026-10-22,09:30,N,,BR-12 day/month
+EN04,E-EN,EN,"Reminder: project proposal submission deadline is 25 October, 11:59 pm",Y,2026-10-25,23:59,N,,BR-12 month name
+EN05,E-EN,EN,"Society general body meeting today at 5:00 PM, Auditorium",Y,2026-10-19,17:00,N,,BR-12 today
+EN06,E-EN,EN,Viva for DS on Thursday 2pm,Y,2026-10-22,14:00,N,,BR-12 day name
+EN07,E-EN,EN,Presentation slots: our group is on 27 Oct at 11:30,Y,2026-10-27,11:30,N,,BR-12
+EN08,E-EN,EN,Assignment 4 deadline: 30/10/2026,Y,2026-10-30,ALLDAY,N,,BR-12; BR-07
+EN09,E-EN,EN,Football practice tonight at 9pm,Y,2026-10-19,21:00,N,,BR-12 tonight
+EN10,E-EN,EN,"Calculus midterm on Monday 26 October, 8:30am",Y,2026-10-26,08:30,N,,BR-12 explicit date wins
+EN11,E-EN,EN,Team sync at 15:00 tomorrow on Google Meet,Y,2026-10-20,15:00,N,,BR-12 24-hour time
+EN12,E-EN,EN,Workshop on Git this Saturday 10am-1pm,Y,2026-10-24,10:00,N,,BR-12 range start
+EN13,E-EN,EN,Don't forget the lab exam on Nov 2 at 1 pm,Y,2026-11-02,13:00,N,,BR-12 month name
+EN14,E-EN,EN,Submit the survey form by Wednesday,Y,2026-10-21,ALLDAY,N,,BR-12 day name; BR-07
+EN15,E-EN,EN,Class rescheduled to 23/10 at 11am,Y,2026-10-23,11:00,N,,BR-12
+EN16,E-EN,EN,"Birthday dinner for Ali on 31st Oct, 8pm at Monal",Y,2026-10-31,20:00,N,,BR-12 ordinal date
+EN17,E-EN,EN,"Seminar on AI ethics today 4:30pm, Room A-1",Y,2026-10-19,16:30,N,,BR-12 today
+EN18,E-EN,EN,Group meeting on Sunday at 7:30 pm,Y,2026-10-25,19:30,N,,BR-12 day name
+EN19,E-EN,EN,Final report is due 5 Nov,Y,2026-11-05,ALLDAY,N,,BR-12; BR-07
+EN20,E-EN,EN,Makeup class tomorrow 8am,Y,2026-10-20,08:00,N,,BR-12 tomorrow
+RU01,E-RU,RU,kal shaam 5 baje project meeting hai,Y,2026-10-20,17:00,N,,BR-12 kal + shaam
+RU02,E-RU,RU,aaj raat 9 baje group call hogi,Y,2026-10-19,21:00,N,,BR-12 aaj + raat
+RU03,E-RU,RU,quiz jumma ko hai subah 9 baje,Y,2026-10-23,09:00,N,,BR-12 jumma = Friday
+RU04,E-RU,RU,assignment 28/10 tak jama karwani hai,Y,2026-10-28,ALLDAY,N,,BR-12; BR-07
+RU05,E-RU,RU,parson dopehar 2 baje viva hai,Y,2026-10-21,14:00,N,,BR-12 parson = +2 days
+RU06,E-RU,MIX,Sir ne bola hai presentation Wednesday ko hogi 11am pe,Y,2026-10-21,11:00,N,,BR-12
+RU07,E-RU,RU,meeting kal subah 10 baje library mein,Y,2026-10-20,10:00,N,,BR-12 subah
+RU08,E-RU,RU,society ka event Saturday shaam 6 baje hai,Y,2026-10-24,18:00,N,,BR-12
+RU09,E-RU,RU,lab report kal tak submit karni hai,Y,2026-10-20,ALLDAY,N,,BR-12; BR-07
+RU10,E-RU,MIX,aaj 4pm pe class hai room C-204 mein,Y,2026-10-19,16:00,N,,BR-12
+RU11,E-RU,RU,proposal 25 Oct tak bhejna hai,Y,2026-10-25,ALLDAY,N,,BR-12; BR-07
+RU12,E-RU,RU,mid term 26/10 ko subah 8:30 baje,Y,2026-10-26,08:30,N,,BR-12
+RU13,E-RU,RU,Areeb ki birthday party Friday raat 8 baje,Y,2026-10-23,20:00,N,,BR-12 raat
+RU14,E-RU,RU,match kal shaam 4 baje hai ground pe,Y,2026-10-20,16:00,N,,BR-12
+RU15,E-RU,MIX,Thursday ko 3pm meeting rakhi hai sir ke office mein,Y,2026-10-22,15:00,N,,BR-12
+RU16,E-RU,RU,deadline 2 Nov hai final project ki,Y,2026-11-02,ALLDAY,N,,BR-12; BR-07
+RU17,E-RU,RU,sadhe 3 baje dopehar ko lab hai aaj,Y,2026-10-19,15:30,N,,BR-12 sadhe = half past
+RU18,E-RU,RU,kal sawa 11 baje subah quiz hoga,Y,2026-10-20,11:15,N,,BR-12 sawa = quarter past
+RU19,E-RU,RU,jummay ko dopehar 2 baje meeting,Y,2026-10-23,14:00,N,,BR-12
+RU20,E-RU,RU,orientation 13/11 ko subah 10 baje hai,Y,2026-11-13,10:00,N,,BR-12
+A01,A,RU,kal 5 baje project meeting hai,Y,2026-10-20,17:00,N,time,U1 bare hour 1-7 = PM
+A02,A,EN,quiz next Friday,Y,2026-10-30,ALLDAY,N,date,U4 next <day> = following week
+A03,A,RU,Monday ko paper hai,Y,2026-10-26,ALLDAY,N,date,U5 own weekday = 7 days later
+A04,A,RU,agle hafte presentation hai,Y,,,Y,,Needs date: period only
+A05,A,EN,project deadline end of month,Y,,,Y,,Needs date: period only
+A06,A,RU,class 03/11 ko hai,Y,2026-11-03,ALLDAY,N,date,U3 both parts <= 12
+A07,A,EN,meeting Friday 24/10 at 3pm,Y,2026-10-24,15:00,N,date,U6 day name conflicts with date
+A08,A,RU,viva 22 ya 23 Oct ko hogi,Y,2026-10-22,ALLDAY,N,date,U7 alternatives = first
+A09,A,MIX,shayad kal meeting ho 4pm,Y,2026-10-20,16:00,N,event,U9 tentative
+A10,A,EN,lab after Zuhr tomorrow,Y,2026-10-20,ALLDAY,N,time,U8 vague time
+A11,A,RU,aaj raat 12 baje submission deadline,Y,2026-10-20,00:00,N,date;time,U2 12 at night = 00:00 next day
+A12,A,EN,meeting at 7,Y,,19:00,Y,time,Needs date; U1
+A13,A,RU,class 9 baje kal,Y,2026-10-20,09:00,N,time,U1 bare hour 8-11 = AM
+A14,A,EN,event 3-5 Saturday,Y,2026-10-24,15:00,N,time,U1 on range start
+A15,A,RU,dhai baje kal meeting,Y,2026-10-20,14:30,N,time,U1 dhai = 2:30
+A16,A,EN,hike plan this weekend,Y,,,Y,event,Needs date; U9 plan
+A17,A,EN,quiz on 10/11,Y,2026-11-10,ALLDAY,N,date,U3
+A18,A,RU,kal ki meeting 11 baje,Y,2026-10-20,11:00,N,time,U1 bare hour 8-11 = AM
+A19,A,EN,deadline extended to Monday,Y,2026-10-26,ALLDAY,N,date,U5
+A20,A,RU,parson subah meeting hai,Y,2026-10-21,ALLDAY,N,time,U8 vague time
+N01,N,EN,The meeting yesterday went well,N,,,N,,past
+N02,N,EN,anyone has the slides?,N,,,N,,no activity
+N03,N,EN,noted,N,,,N,,no activity
+N04,N,RU,kal ki class bohat boring thi,N,,,N,,past (thi)
+N05,N,EN,Quiz 2 was really hard,N,,,N,,past
+N06,N,MIX,ok sir,N,,,N,,no activity
+N07,N,EN,Thanks everyone for coming to the event on Saturday,N,,,N,,past
+N08,N,RU,kya scene hai,N,,,N,,no activity
+N09,N,EN,send me the notes please,N,,,N,,no activity
+N10,N,EN,happy birthday Ali!!,N,,,N,,"greeting, no plan"
+N11,N,RU,parson wali meeting mein kya decide hua tha?,N,,,N,,past (hua tha)
+N12,N,EN,Room C-204 is so cold,N,,,N,,no activity
+N13,N,EN,lol,N,,,N,,no activity
+N14,N,RU,acha theek hai,N,,,N,,no activity
+N15,N,RU,assignment ho gaya submit,N,,,N,,past (ho gaya)
+N16,N,RU,Friday ko jo party thi wo zabardast thi,N,,,N,,past (thi)
+N17,N,EN,who made these slides? they're great,N,,,N,,no activity
+N18,N,RU,sir ka number kis ke paas hai,N,,,N,,no activity
+N19,N,EN,I'll check and let you know,N,,,N,,no activity
+N20,N,RU,class mein aaj kya parhaya?,N,,,N,,past (parhaya)
