@@ -1,4 +1,5 @@
 import express, { type ErrorRequestHandler } from 'express';
+import * as chats from './modules/chats';
 import * as identity from './modules/identity';
 import { DatabaseNotConfigured, getPool } from './shared/db';
 import { logError } from './shared/log';
@@ -26,6 +27,7 @@ app.get('/api/health', async (_req, res) => {
 app.use('/api', identity.publicRouter);
 app.use('/api', identity.requireUser());
 app.use('/api', identity.router);
+app.use('/api', chats.router);
 
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'not_found' });

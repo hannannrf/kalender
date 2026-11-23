@@ -1,0 +1,194 @@
+.sheet {
+  background: var(--card);
+  border-radius: var(--radius-sheet);
+  padding: var(--space-6) var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.sheet h2 {
+  font-size: var(--text-xl);
+}
+
+.steps {
+  margin: 0;
+  padding-left: var(--space-6);
+  display: grid;
+  gap: var(--space-2);
+  color: var(--muted);
+}
+
+.fileName {
+  color: var(--muted);
+  font-size: var(--text-md);
+  overflow-wrap: anywhere;
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.field label,
+.field legend {
+  font-weight: 500;
+  padding: 0;
+  margin-bottom: var(--space-1);
+}
+
+.field input[type='text'],
+.field input:not([type]) {
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.field input:not([type]):focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 1px;
+  background: var(--card);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.segment {
+  position: relative;
+  margin: 0;
+}
+
+.segment input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segment span {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.segment input:checked + span {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+
+.segment input:focus-visible + span {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: var(--text-md);
+}
+
+.fieldError {
+  color: var(--danger);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.problem {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+  font-weight: 500;
+}
+
+.done {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border-left: var(--bar-width) solid var(--chat-4);
+  padding: var(--space-3) var(--space-4);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+}
+
+.primary {
+  min-height: 48px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--primary);
+  color: var(--on-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.primary:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.listTitle {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-2);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.list li {
+  display: grid;
+  gap: 2px;
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border-left: var(--bar-width) solid;
+  padding: var(--space-3) var(--space-4);
+}
+
+.chatName {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: var(--text-md);
+}

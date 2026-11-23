@@ -93,6 +93,8 @@ Process note: Vercel blocked the first S01 preview because the commits were auth
 
 **Bug found during the manual check, fixed in this slice:** when the API was down, the Vite dev proxy answered `/api/me` with the HTML page and status 200, and the PWA treated that as "signed in" (empty email). The same would happen with any HTML answer, such as a Vercel login page. `web/src/api.ts` now refuses any answer that is not JSON, so the app shows "Kalender is not reachable" with Try again. Checked again in the browser after the fix.
 
+Production check after the merge (23 Nov 2026, recorded on the S02 branch): CI on `main` green for 83c6bd0; the production build log shows `migrate: applied 1 (001_identity_create_users_and_sessions.sql)` on the Neon `production` branch; `GET /api/health` returned `{"status":"ok","db":"ok"}` and `GET /api/me` returned 401 when signed out. No test account was created in production.
+
 ## 7. Human decision
 
 **Accept**, Abdul Hannan Rauf, 23 Nov 2026 ("Accept, merge and tag"). Reason: criteria S01-1 to S01-8 pass in CI, against Neon `dev`, on the deployed preview and in the manual phone-size check; the security choices in section 5 and the known limits are accepted for now.

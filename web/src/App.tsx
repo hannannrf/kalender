@@ -2,7 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { BottomNav } from './components/BottomNav';
 import { EmptyState } from './components/EmptyState';
 import { AuthPage } from './pages/AuthPage';
-import { ChatsPage, EventsPage, InboxPage, SettingsPage } from './pages/Pages';
+import { ChatsPage } from './pages/ChatsPage';
+import { EventsPage, InboxPage, SettingsPage } from './pages/Pages';
 import pageStyles from './pages/Page.module.css';
 import { useSession } from './session';
 
