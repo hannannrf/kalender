@@ -59,12 +59,12 @@ Not yet verified: the Vercel preview deployment (the Vercel project is not linke
 
 ## 7. Human decision
 
-Pending: Accept / Revise / Reject by Abdul Hannan Rauf after reviewing the PR and the Vercel preview.
+**Accept**, Abdul Hannan Rauf, 23 Nov 2026 ("Yes, merge and tag"). Reason: every S00 criterion passes and CI is green (38 s, including the database health test against Postgres 17). The Vercel deployment is checked right after the merge, because production deploys `main`.
 
 ## 8. Integrate
 
-Pending: merge the PR into `main`, confirm CI is green on `main` (Gate 4), tag `S00-accepted`.
+PR #1 merged into `main` with a merge commit, tagged `S00-accepted`; CI on `main` is Gate 4.
 
 ## 9. Context updated
 
-README written; `.env.example` lists every variable later slices need; `plan.md` S00 status is "In progress" until the human accepts.
+README written; `.env.example` lists every variable later slices need; `plan.md` S00 status set to Accepted.
