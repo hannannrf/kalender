@@ -1,12 +1,16 @@
-# Product Requirements Document (PRD): WhatsApp & Calendar Sync
+# Product Requirements Document (PRD): Kalender
 
 | Field | Value |
 |---|---|
-| Version | 1.1 (Validated: TA change requests applied and confirmed with Mahd) |
-| Previous version | 1.0 (Validated, after AI critique and human validation, Deliverable 2) |
+| Version | 1.2 (product renamed for Deliverable 4; no requirement changed) |
+| Previous version | 1.1 (Validated: TA change requests applied and confirmed with Mahd) |
 | Course | ISE1003 Introduction to Software Engineering, Deliverable 3 input |
 | Client | Mahd Ahmed |
 | Team | Abdul Hannan Rauf, Zain Amjad, Muhammad Areeb |
+
+## Changes in v1.2
+
+The product is renamed from "WhatsApp & Calendar Sync" to **Kalender** ("kal" is tomorrow in Urdu, plus calendar). "WhatsApp" in a product name is a Meta trademark; the PRD keeps it only to describe the input file ("WhatsApp Chat Export"). No FR, NFR, BR, constraint, acceptance criterion or threshold changed. Decision D-20, gap G-01 in `evidence/stage2/gap-review.md`.
 
 ## Changes in v1.1
 

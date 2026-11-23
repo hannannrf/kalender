@@ -1,12 +1,13 @@
 # AGENTS.md: instructions for AI coding agents
 
-You are working on **WhatsApp & Calendar Sync**, a phone-first app for a student, Mahd. He exports WhatsApp Chats and uploads them. The app detects meetings and deadlines in English and Roman Urdu, lets him confirm them, reminds him before each one, and copies them to his Google Calendar.
+You are working on **Kalender**, a phone-first PWA for a student, Mahd. He exports WhatsApp Chats and uploads them. The app detects meetings and deadlines in English and Roman Urdu, lets him confirm them, reminds him before each one, and copies them to his Google Calendar.
 
 Read these before doing anything, in this order:
-1. `PRD.md`: the requirements (FR, NFR, BR, C, AC and glossary). **Its glossary terms are the names you use in code and UI.**
-2. `architecture.md`: modules, boundaries, interfaces, data ownership. **Sections 14 and 15** list design decisions already answered; do not ask them again.
-3. `adr/ADR-*.md`: decisions you must respect. Do not contradict an Accepted ADR.
+1. `docs/PRD.md`: the requirements (FR, NFR, BR, C, AC and glossary). **Its glossary terms are the names you use in code and UI.**
+2. `docs/architecture.md`: modules, boundaries, interfaces, data ownership. **Sections 14 and 15** list design decisions already answered; do not ask them again.
+3. `docs/adr/ADR-*.md`: decisions you must respect. Do not contradict an Accepted ADR.
 4. `fixtures/README.md`: test data you must use unchanged.
+5. `plan.md`: the current slice, its acceptance criteria and status. `docs/decisions.md`: decisions made during D4.
 
 If any instruction here conflicts with those files, stop and ask (see the last section).
 
@@ -26,6 +27,7 @@ If any instruction here conflicts with those files, stop and ask (see the last s
 - **Database:** PostgreSQL through `pg` (node-postgres) with plain SQL migration files.
 - **Tests and tooling:** Vitest, `supertest`, ESLint + `typescript-eslint` (the boundary rules in section 4 are enforced with `no-restricted-imports`), GitHub Actions with a Postgres service container.
 - **Deployment:** Vercel (PWA plus **one** function), a free Postgres (Neon or Supabase), and cron-job.org calling `/internal/tick` every minute.
+- **Styling:** CSS Modules plus one `web/src/styles/tokens.css` holding every colour, radius, spacing and font token (see `docs/design/ui-direction.md`). Fonts: Bricolage Grotesque (headings) and DM Sans (body) from Google Fonts with `display=swap`. Icons: Tabler icons pasted as inline SVG components. No Tailwind, UI kit or icon package.
 - **Deliberately not used:** an ORM, a date library, `googleapis`, `zod`, `node-cron`, `express-session`.
 
 **Do not add** a new framework, ORM, database, queue, cache, auth provider, cloud service, LLM or NLP library without raising it for human approval (section 7).
@@ -105,6 +107,7 @@ If any instruction here conflicts with those files, stop and ask (see the last s
 - **Detection gate:** `detection` must be tested against `detection_test_set.csv` with the NFR-05 thresholds (M1–M4). This test is a CI gate. **Never edit the test set or thresholds to make it pass**; fix the rules.
 - **Exports:** `ingestion` and `chats` tests use the sample exports and the demo cases N1, N2, B1, B2, F1, F2 and F3 mapped in `fixtures/README.md`, plus the real exports in `fixtures/exports/real/` once the team adds them.
 - **Isolation:** every resource type has a two-User access test (AC-01.2).
+- **Manual checks:** ACs that need a real phone or a real Google account (push, Google Calendar copies) and pure UI ACs are verified by a manual checklist row with a screenshot in the slice evidence file (R2-16, gap G-10).
 
 ## 7. Actions that need human approval first
 
@@ -124,3 +127,12 @@ Stop and ask before you:
 - If a requirement is unclear, ask a question that names the requirement id (for example "BR-21 U1: does '12 baje' with 'raat' count as U2?"). Do not invent behaviour.
 - Do not implement features the PRD lists as Non-goals or Open Questions (for example Snooze, OQ-04).
 - When you finish a task, list which FR, BR and AC ids it covers and any assumption you made.
+
+## 9. Git and evidence workflow
+
+- `main` is always deployable. Vercel deploys `main` to production and every PR to a preview.
+- One branch per slice: `slice/Sxx-short-name`. Commit messages start with the slice id (`S03: add day-word rules`). Merge with a PR whose description lists the ACs covered and the check results.
+- After the human accepts a slice, tag the merge commit `Sxx-accepted`.
+- Every slice has `evidence/slices/Sxx-*.md` (criteria, HITL or AFK, prompt, checks, human decision) and one row in `evidence/workflow-evidence-log.md`.
+- When `plan.md` changes in a meaningful way, copy it to `docs/plan-history/plan-vNN.md` in the same commit.
+- Never commit `.env*` files except `.env.example`, secrets, real names from exports, or message text outside `fixtures/`.

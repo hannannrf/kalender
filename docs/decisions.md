@@ -1,0 +1,14 @@
+# Decisions log (Deliverable 4)
+
+D-01 to D-19 are recorded in the PRD change log (Deliverables 2 and 3). This file continues from D-20. Each decision says who approved it and where the evidence is.
+
+| ID | Date | Decision | Alternatives considered | Approved by | Evidence |
+|---|---|---|---|---|---|
+| D-20 | 23 Nov 2026 | Product name is **Kalender** ("kal" is tomorrow in Urdu, plus calendar). "WhatsApp" stays only as a description of the input file. | Several generated names; keeping "WhatsApp & Calendar Sync" (Meta trademark in a product name). | Abdul Hannan Rauf for the team | Planning session transcript; gap G-01 |
+| D-21 | 23 Nov 2026 | Deploy on **Vercel** (PWA plus one function, ADR-002 unchanged), source on a **private GitHub repo**. Local-only deployment was considered and rejected. | Local laptop demo with an HTTPS tunnel. | Abdul Hannan Rauf | Planning session; gap G-04 |
+| D-22 | 23 Nov 2026 | Database is **Neon** free Postgres, one project with a `dev` branch (local and tests) and a `main` branch (production). CI uses a Postgres service container. | Local PostgreSQL install; PGlite (new dependency, ADR change). | Abdul Hannan Rauf | Gap G-09 |
+| D-23 | 23 Nov 2026 | **No LLM in the product.** Detection stays rule-based (ADR-004). Google AI Studio's free tier may use submitted content for training, which would include classmates' messages (BR-05, NFR-01), and NFR-05 needs deterministic results. AI is used in the development process only. | Gemini for detection or for title cleanup. | Abdul Hannan Rauf | Planning session |
+| D-24 | 23 Nov 2026 | UI direction **"Chat colours"**: each Approved Chat has its own colour; white Event cards with a colour bar; Bricolage Grotesque and DM Sans; yellow mark, icon and "Check this" text for Uncertain details. Full tokens in `docs/design/ui-direction.md`. | Two other rendered concepts (rejected by the team). | Abdul Hannan Rauf | Planning session; gaps G-02, G-03 |
+| D-25 | 23 Nov 2026 | Git workflow: `main` always deployable, one `slice/Sxx-name` branch and PR per slice, commits prefixed with the slice id, `Sxx-accepted` tag after the human accepts, `plan.md` copied to `docs/plan-history/` on each meaningful change. | Committing directly to `main`. | Abdul Hannan Rauf | Planning session; AGENTS.md section 9 |
+| D-26 | 23 Nov 2026 | Keep **FR-08 Google Calendar** in scope (Should). A Google Cloud OAuth client in Testing mode is created by the team. | Drop FR-08 (PRD change, client must agree). | Abdul Hannan Rauf | Master plan D-C |
+| D-27 | 23 Nov 2026 | Extra feature candidate: **OQ-05 upload nudge** as Could-have slice S12. Added to the PRD (v1.3, FR-14) only if it is built. | Snooze (OQ-04, contradicts NG-07); `.ics` download. | Abdul Hannan Rauf | Master plan D-D; gap G-08 |

@@ -1,17 +1,17 @@
-# Architecture: WhatsApp & Calendar Sync
+# Architecture: Kalender
 
 | Field | Value |
 |---|---|
 | Course | ISE1003 Introduction to Software Engineering, Deliverable 3 |
 | Client | Mahd Ahmed |
 | Team | Abdul Hannan Rauf (25I-3053), Zain Amjad (25I-3042), Muhammad Areeb (25I-3056) |
-| Requirements source | `PRD.md` v1.1 (validated, TA changes applied) |
+| Requirements source | `PRD.md` v1.2 (v1.1 validated, TA changes applied; v1.2 renames the product only) |
 | Decisions | `adr/ADR-001` … `adr/ADR-005` |
-| Status | Accepted by the team; context v1.2 (refined after two AI-agent validation runs, see sections 14 and 15) |
+| Status | Accepted by the team; context v1.3 (v1.2 refined after two AI-agent validation runs, see sections 14 and 15; v1.3 adds the D4 gap-review changes in section 16) |
 
 ## 1. System overview
 
-WhatsApp & Calendar Sync helps a student stop missing meetings and deadlines announced in WhatsApp groups, without giving up the privacy of other Chats.
+Kalender (formerly "WhatsApp & Calendar Sync") helps a student stop missing meetings and deadlines announced in WhatsApp groups, without giving up the privacy of other Chats.
 
 1. The User exports a Chat from WhatsApp ("Export chat > Without media") and uploads the file to the app. This approves that Chat (FR-02).
 2. The server reads only new text messages from the allowed time window and detects Events in English and Roman Urdu.
@@ -234,6 +234,7 @@ Every step is batched, uses `FOR UPDATE SKIP LOCKED`, and is safe to run twice.
 
   These change only in the same transaction that stores the detection results.
 - **Source Chat** is identified by Chat id for Possible Duplicate (BR-04). Confirmed Events keep the Chat name as text, so they outlive a Revoke (BR-06).
+- **Chat colour** (UI only): `chats` owns `approved_chats.colour`, chosen at approval as the first colour of the fixed 8-colour palette not used by the User's other non-Revoked Chats (wrapping when all are used). `events` copies it with the Chat name onto each Detected and Confirmed Event, so it also outlives a Revoke. Manual Events have no colour; the PWA shows them in neutral grey.
 - **Times:**
   - instants are stored as UTC `timestamptz` and shown in PKT (UTC+5, no daylight saving);
   - Event dates are stored as a `date` plus an optional `time`;
@@ -405,3 +406,15 @@ The agent's stated structural assumptions were reviewed and accepted:
 - a CI parity check between the TypeScript scorer and `evaluate.py`.
 
 **Validation outcome:** two runs moved from 29 questions, 16 of them conflicts between our own documents, to 18 detail-level questions with one real conflict (R2-1). The team judges context v1.2 sufficient to guide AI-assisted development. The next run happens at the start of implementation, against the real exports.
+
+## 16. Changes from the Deliverable 4 gap review (context v1.3)
+
+Source: `evidence/stage2/gap-review.md`. Decisions: `docs/decisions.md`.
+
+| Gap | Change |
+|---|---|
+| G-01 | Product renamed to Kalender. |
+| G-02 | Chat colour added to `approved_chats` (owned by `chats`) and copied onto Events (section 8). No new module, interface or dependency. |
+| G-03 | Styling rules (CSS Modules, `tokens.css`, Google Fonts, inline Tabler icons) added to AGENTS.md section 2. |
+| G-10 | Push and Google Calendar ACs may be verified by a manual checklist row with a screenshot. |
+| G-12 | The PWA maps detection rule ids to short user-facing explanations ("kal means tomorrow"). `detection` itself is unchanged. |
