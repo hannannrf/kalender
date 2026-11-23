@@ -1,0 +1,147 @@
+.page {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: var(--space-8) var(--space-4) var(--space-8);
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+}
+
+.brand {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.wordmark {
+  font-size: 2.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.lede {
+  color: var(--muted);
+  max-width: 34ch;
+}
+
+.preview {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.preview li {
+  display: grid;
+  gap: 2px;
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border-left: var(--bar-width) solid;
+  padding: var(--space-3) var(--space-4);
+}
+
+/* Staggered like a short stack of notifications; flat on narrow screens would read as a list of real data. */
+.preview li:nth-child(2) {
+  margin-left: var(--space-4);
+}
+
+.preview li:nth-child(3) {
+  margin-left: var(--space-8);
+}
+
+.previewTitle {
+  font-weight: 700;
+}
+
+.previewMeta {
+  color: var(--muted);
+  font-size: var(--text-md);
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius-sheet);
+  padding: var(--space-6) var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.card h2 {
+  font-size: var(--text-xl);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.field label {
+  font-weight: 500;
+}
+
+.field input {
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.field input:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 1px;
+  background: var(--card);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: var(--text-md);
+}
+
+.fieldError {
+  color: var(--danger);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.formError {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+  font-weight: 500;
+}
+
+.primary {
+  min-height: 48px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--primary);
+  color: var(--on-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.switch {
+  text-align: center;
+  color: var(--muted);
+}
+
+.switch a {
+  color: var(--text);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
