@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v02 (23 Nov 2026) |
+| Plan version | v03 (23 Nov 2026) |
+| Changes from v02 | S02 Accepted; O-3 now needed before `ingestion` is accepted in S05 (S02 reads Android `.txt` only), one real iPhone export received |
 | Changes from v01 | AC-02.5 moved from S01 to S02 (the Approved Chats list arrives in S02); S01 Accepted; O-1 and O-2 done |
 | History | `docs/plan-history/plan-vNN.md` plus `git log -- plan.md` |
 | Context | `docs/PRD.md` v1.2, `docs/architecture.md` v1.3, `AGENTS.md`, `docs/adr/`, `docs/decisions.md` |
@@ -26,7 +27,7 @@ Ship Kalender: a phone-first PWA where a student uploads WhatsApp Chat Exports, 
 |---|---|---|---|
 | O-1 | Neon project and `DATABASE_URL` for `dev` and `main` branches (G-09) | Abdul Hannan Rauf | Done 23 Nov (Neon branches `dev` and `production`) |
 | O-2 | Vercel project linked to the GitHub repo, env vars set | Abdul Hannan Rauf | Done 23 Nov |
-| O-3 | One real Android and one real iPhone export, names replaced (G-06) | Zain Amjad | Before S02 is accepted |
+| O-3 | One real Android and one real iPhone export, names replaced (G-06). One iPhone export received 23 Nov (month/day, two-digit year), not yet anonymised | Zain Amjad | Before `ingestion` is accepted in S05 |
 | O-4 | Google Cloud OAuth client (Testing mode) | Zain Amjad | Before S11 |
 | O-5 | cron-job.org job calling `/internal/tick` every minute | Abdul Hannan Rauf | Before S07 is accepted |
 | O-6 | NFR-04 session with Mahd and two classmates on 26 Nov (G-07) | Muhammad Areeb | S13 |
@@ -48,7 +49,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 |---|---|---|---|---|---|---|---|---|---|---|
 | S00 | Walking skeleton: app shell with Kalender tokens loads; `/api/health` answers; test, lint and CI run; deploys to Vercel | infra | – | – | AFK | M | Tue 24 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
 | S01 | Create account, sign in and out, see only own data | FR-01, BR-11 | 01.1, 01.2 | S00 | HITL | M | Tue 24 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
-| S02 | Approve a Chat from an Android `.txt` export: preview name, choose Look-back, see messages read; bad files refused | FR-02, BR-01..03, BR-05, BR-15, NFR-01 | 02.1, 02.3, 02.5 | S01 | HITL | M | Tue 24 | Zain Amjad | Planned | – |
+| S02 | Approve a Chat from an Android `.txt` export: preview name, choose Look-back, see messages read; bad files refused | FR-02, BR-01..03, BR-05, BR-15, NFR-01 | 02.1, 02.3, 02.5 | S01 | HITL | M | Tue 24 | Zain Amjad | Accepted | G1 G2 G3 pass |
 | S03 | Detected Events appear after upload (English and Roman Urdu rules, Uncertain marks, Needs date) plus the NFR-05 gate | FR-05, BR-12, BR-17, BR-20, BR-21, NFR-05 | 05.1..05.9, 05.12, 05.13 | S02 | HITL | M | Tue 24 | Abdul Hannan Rauf | Planned | – |
 | S04 | Review a Detected Event: resolve Uncertain details, edit, confirm, dismiss; upcoming Events list | FR-06, FR-11, BR-05, BR-16 | 06.1..06.3, 06.5, 06.7, 06.8, 11.1, 11.2 | S03 | HITL | M | Wed 25 | Muhammad Areeb | Planned | – |
 | S05 | Update an Approved Chat, iPhone `.zip`, date-order question, Approved Chats list, Revoke | FR-03, FR-04, BR-02, BR-06, BR-15 | 02.2, 02.4, 03.1..03.3, 04.1, 04.2 | S02, S03 | AFK | M | Wed 25 | Zain Amjad | Planned | – |

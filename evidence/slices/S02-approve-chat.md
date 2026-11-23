@@ -99,12 +99,12 @@ Found and fixed during the manual check: approving a Chat whose messages are all
 
 ## 7. Human decision
 
-Pending.
+**Accept**, Abdul Hannan Rauf, 23 Nov 2026 ("Accept, merge and tag"). Reason: criteria S02-1 to S02-10 pass in CI, against Neon `dev`, on the deployed preview and in the manual phone-size check; the known limits (no detection until S03; iPhone `.zip`, date-order screen, update and Revoke in S05) are accepted. The real iPhone export stays out of the repository until names are replaced (O-3).
 
 ## 8. Integrate
 
-Pending.
+PR #3 merged into `main` with a merge commit, tagged `S02-accepted`; CI on `main` is Gate 4. Production applies migration 002 to the Neon `production` branch during the build.
 
 ## 9. Context updated
 
-Pending.
+`plan.md` v03 (copy in `docs/plan-history/plan-v03.md`): S02 Accepted, O-3 updated (one real iPhone export received, not yet anonymised). Row 5 added to `evidence/workflow-evidence-log.md`.
