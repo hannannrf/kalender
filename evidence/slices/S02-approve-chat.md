@@ -87,7 +87,8 @@ Known limits (each closed by a later slice):
 ## 6. Checks
 
 - Local against the Neon `dev` branch: **68 passed, 2 skipped** (`evidence/test-runs/S02-2026-11-23-neon-dev.txt`): 22 `ingestion` unit tests (EP/BVA table above, N1, F2, B2 and the B1 boundary case) and 13 `chats` tests (AC-02.1, AC-02.3, AC-02.5, preview stores nothing, emoji name, duplicate, invalid fields, TOO_LARGE, two Users, NFR-01 no text stored, needs a session). The test run applied migration 002 to Neon `dev`.
-- Lint (boundary rules), typecheck and build clean.
+- Lint (boundary rules), typecheck and build clean. CI on PR #3 (Postgres 17): green.
+- Deployed preview (https://kalender-fg168hsp8-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl`: register 201; preview of the SE-3D Class export 200 with `{"chatNameFromFile":"SE-3D Class"}`; approve 201 with colour 1 and `messagesRead` 0 (every sample message is older than 7 days today); `notes.txt` 422 `NOT_AN_EXPORT` with the message; list 200 with the one Chat. Multipart uploads work through the single Vercel function.
 - Manual check at 375 x 812, local PWA and API on Neon `dev`: export steps, preview with the name from the file, Look-back with 7 days preselected, approval result, Approved Chats list with the first Chat colour, and the `notes.txt` refusal shown above the button.
 
 | Export steps | Confirm name and Look-back | Approved | Not an export |
