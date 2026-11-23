@@ -95,12 +95,12 @@ Process note: Vercel blocked the first S01 preview because the commits were auth
 
 ## 7. Human decision
 
-Pending.
+**Accept**, Abdul Hannan Rauf, 23 Nov 2026 ("Accept, merge and tag"). Reason: criteria S01-1 to S01-8 pass in CI, against Neon `dev`, on the deployed preview and in the manual phone-size check; the security choices in section 5 and the known limits are accepted for now.
 
 ## 8. Integrate
 
-Pending.
+PR #2 merged into `main` with a merge commit, tagged `S01-accepted`; CI on `main` is Gate 4. Production applies migration 001 to the Neon `production` branch during the build.
 
 ## 9. Context updated
 
-Pending.
+`plan.md` v02 (copy in `docs/plan-history/plan-v02.md`): S01 Accepted, AC-02.5 moved to S02, O-1 and O-2 done. Row 4 added to `evidence/workflow-evidence-log.md`.
