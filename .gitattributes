@@ -2,3 +2,4 @@
 fixtures/** -text
 *.png binary
 *.zip binary
+*.jpg binary

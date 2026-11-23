@@ -1,0 +1,26 @@
+{
+  "name": "kalender",
+  "private": true,
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "npm run build -w web",
+    "typecheck": "tsc -p server --noEmit && tsc -p web --noEmit && tsc -p api --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --root server"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^5.1.1"
+  }
+}
