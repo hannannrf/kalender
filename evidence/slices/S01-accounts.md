@@ -55,11 +55,29 @@ HITL. The human reviews the criteria above, the security choices in section 5, a
 
 ## 5. AI implementation
 
-Filled in after the run.
+Prompt: "Build S01 from plan.md v01 and the criteria in this file, following AGENTS.md: an `identity` module with registerAccount, signIn, signOut, me and requireUser; `users` and `sessions` tables in a migration owned by identity; bcrypt passwords; hashed session tokens in an HttpOnly cookie; field errors in the PWA; no extra features."
+
+What the agent built:
+- `server/migrations/001_identity_create_users_and_sessions.sql` and a small migration runner (`server/src/shared/migrate.ts`), run by tests, by `npm run migrate -w server`, and by every Vercel build, so each build migrates its own database (preview uses the Neon `dev` branch, production the `production` branch).
+- `server/src/modules/identity/`: `domain.ts` (validation), `repository.ts` (the only SQL on `users` and `sessions`), `service.ts`, `routes.ts`, `index.ts`. The composition root mounts the public routes, then `requireUser()` once on `/api`, then the signed-in routes.
+- `shared/http.ts` (`AuthedRequest`, `userIdOf`), `shared/log.ts` (logs error name and code only, never messages), `shared/db.ts` (`db()` answers 503 when no database is configured).
+- New lint rule: no module may import `identity` (with a test that guards the rule).
+- PWA: `session.tsx` (loads `/api/me`, signed-in, signed-out or offline), `AuthPage` (sign in and create account), sign out in Settings, Chat palette tokens `--chat-1` to `--chat-8`.
+
+Security choices for the human to review:
+- Password: bcrypt cost 12, 8 to 72 bytes. Session token: 32 random bytes; only its SHA-256 is stored; 30-day expiry.
+- Cookie: HttpOnly, SameSite=Lax (blocks cross-site POSTs, so no separate CSRF token), Secure on Vercel.
+- Sign-in: one message for a wrong email or password, and an unknown email is checked against a dummy hash so both take the same time. Registration does say that an email is taken (409), which reveals that the account exists; accepted as normal for sign-up.
+- Not done (known limits): no rate limit on sign-in; expired sessions are refused but not yet purged (the `purgeExpiredSessions` tick task comes with `jobs` in S07).
+- Assumption: identity's lookups by email and by session token cannot take a `userId` first (AGENTS.md section 5), because no User is known yet at that point.
+
+Process note: Vercel blocked the first S01 preview because the commits were authored by the GitHub account `i253053`, while the Vercel Hobby project belongs to `hannannrf`, and Hobby deploys only the owner's commits. The human approved committing as `hannannrf` in this repository only ("Yes, use hannannrf"). Teammates' commits will be blocked the same way; their work deploys when the owner merges it.
 
 ## 6. Checks
 
-Filled in after the run.
+- Local: 24 passed, 11 skipped (no local database). Lint, typecheck, build clean.
+- CI on PR #2 (Postgres 17 service): **33 passed, 2 skipped** (the two no-database cases). All 10 identity route tests and 13 EP/BVA domain tests ran. The build step ran the migration again: "applied 0 (none new)", so it is safe to repeat.
+- Manual check of the screens on the Vercel preview: below.
 
 ## 7. Human decision
 
