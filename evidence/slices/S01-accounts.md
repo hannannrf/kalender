@@ -77,7 +77,14 @@ Process note: Vercel blocked the first S01 preview because the commits were auth
 
 - Local: 24 passed, 11 skipped (no local database). Lint, typecheck, build clean.
 - CI on PR #2 (Postgres 17 service): **33 passed, 2 skipped** (the two no-database cases). All 10 identity route tests and 13 EP/BVA domain tests ran. The build step ran the migration again: "applied 0 (none new)", so it is safe to repeat.
-- Manual check of the screens on the Vercel preview: below.
+- Deployed preview (https://kalender-n8cxj4vva-hannan-f17c.vercel.app, Neon `dev` branch), driven with `vercel curl` because preview deployments are behind Vercel Authentication: the build log shows `migrate: applied 1 (001_identity_create_users_and_sessions.sql)`; register 201, `/api/me` 200 with the same email, sign-out 204, `/api/me` 401 afterwards, sign-in 200, wrong password 401 with the generic message. The cookie came back HttpOnly and Secure.
+- Manual check of the screens at 375 x 812 (local dev server): the sign-in screen, and the create-account screen with both field errors under their fields.
+
+| Sign in | Create account with field errors |
+|---|---|
+| ![Sign in](S01/sign-in-mobile.jpg) | ![Errors](S01/create-account-errors.jpg) |
+
+**Bug found during the manual check, fixed in this slice:** when the API was down, the Vite dev proxy answered `/api/me` with the HTML page and status 200, and the PWA treated that as "signed in" (empty email). The same would happen with any HTML answer, such as a Vercel login page. `web/src/api.ts` now refuses any answer that is not JSON, so the app shows "Kalender is not reachable" with Try again. Checked again in the browser after the fix.
 
 ## 7. Human decision
 
