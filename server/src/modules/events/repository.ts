@@ -24,13 +24,14 @@ export type NewDetected = {
   rules: string[];
 };
 
-export async function insertDetected(db: Db, userId: string, e: NewDetected): Promise<void> {
-  await db.query(
+export async function insertDetected(db: Db, userId: string, e: NewDetected): Promise<string> {
+  const res = await db.query<{ id: string }>(
     `insert into detected_events
        (user_id, chat_id, chat_name, chat_colour, source_message_id, title, date, time, place, uncertain, rules)
-     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id`,
     [userId, e.chatId, e.chatName, e.chatColour, e.sourceMessageId, e.title, e.date, e.time, e.place, e.uncertain, e.rules],
   );
+  return res.rows[0].id;
 }
 
 export type DetectedRow = {

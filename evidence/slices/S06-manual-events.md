@@ -98,6 +98,8 @@ Found and fixed during the manual check:
 
 PR #6 merged into `main` with a merge commit, tagged `S06-accepted`; CI on `main` is Gate 4. No migration in this slice.
 
+After merge: CI on `main` passed at `66f1e9f`. Production deployment `kalender-p9m2azcm3` is aliased to https://kalender-tan-eta.vercel.app; `/api/health` answers `{"status":"ok","db":"ok"}`, and `GET /api/events` and `DELETE /api/events/:id` answer 401 when signed out.
+
 ## 9. Context updated
 
 `plan.md` v06 (copy in `docs/plan-history/plan-v06.md`): S06 Accepted. Row 8 added to `evidence/workflow-evidence-log.md`.

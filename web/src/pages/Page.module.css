@@ -113,3 +113,61 @@
   outline: 3px solid var(--text);
   outline-offset: 2px;
 }
+
+.choiceSet {
+  border: 0;
+  margin: 0;
+  padding: var(--space-3) 0;
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.choiceSet legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.segment {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--target);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.segment input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segment:has(input:checked) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+
+.segment:has(input:focus-visible) {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.note {
+  color: var(--muted);
+  font-size: var(--text-md);
+}

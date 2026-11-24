@@ -1,0 +1,71 @@
+.stack {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius-card);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+}
+
+/* Late and missed Reminders are information, not a call to act now. */
+.quiet {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.icon svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.text {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.when {
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+}
+
+.seen {
+  min-height: var(--target);
+  min-width: var(--target);
+  padding: 0 var(--space-3);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-control);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seen:focus-visible {
+  outline: 3px solid var(--badge);
+  outline-offset: 2px;
+}

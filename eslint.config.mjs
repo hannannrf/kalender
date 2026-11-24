@@ -31,6 +31,25 @@ export default tseslint.config(
     rules: { 'no-restricted-imports': ['error', { patterns: [noDeepModuleImports, noIdentityImports] }] },
   },
   {
+    // jobs imports no module (Q-1); reminders may use only jobs (AGENTS.md section 4).
+    files: ['server/src/modules/jobs/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: [{ regex: String.raw`^\.\./(?!\.\.)`, message: 'jobs imports no other module; modules register into it (Q-1).' }] },
+      ],
+    },
+  },
+  {
+    files: ['server/src/modules/reminders/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: [noDeepModuleImports, noIdentityImports, { regex: String.raw`^\.\./(?!\.\.|jobs(/index)?$)`, message: 'reminders may use only jobs (AGENTS.md section 4).' }] },
+      ],
+    },
+  },
+  {
     files: ['server/src/modules/identity/**/*.ts'],
     rules: { 'no-restricted-imports': ['error', { patterns: [noDeepModuleImports] }] },
   },

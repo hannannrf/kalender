@@ -1,5 +1,7 @@
 // Detected Events (FR-05, FR-06), Confirmed Events (FR-11) and Source Message lifetime (BR-05).
 import { detect, type DetectedEventDraft, type Mark } from '../detection';
+import * as jobs from '../jobs';
+import type { EventSnapshot } from '../../shared/contracts/outbox';
 import { withTransaction, type Db } from '../../shared/db';
 import { eventStart, pktParts, startOfMinute } from '../../shared/time';
 import type { Pool } from 'pg';
@@ -17,6 +19,17 @@ function stillUpcoming(d: DetectedEventDraft, sentAt: Date, now: Date): boolean 
   return eventStart(d.date, d.time) > now;
 }
 
+const EXPIRE = 'events.expireDetected';
+
+/** BR-14 and BR-05: a dated Detected Event goes at the end of its date (00:00 PKT next day); a Needs date one 7 days after sending. */
+function expiryOf(date: string | null, sentAt: Date): Date {
+  return date === null ? new Date(sentAt.getTime() + 7 * DAY_MS) : new Date(eventStart(date, null).getTime() + DAY_MS);
+}
+
+async function scheduleExpiry(tx: Db, userId: string, detectedId: string, date: string | null, sentAt: Date): Promise<void> {
+  await jobs.enqueue(tx, EXPIRE, { detectedId }, { runAt: expiryOf(date, sentAt), userId, dedupeKey: detectedId });
+}
+
 /**
  * Detects Events in messages read from an upload and stores them with their Source Message.
  * Runs inside the caller's transaction. A message with no upcoming Event is not stored (BR-05, AC-05.4).
@@ -29,7 +42,7 @@ export async function ingestMessages(userId: string, chat: ChatRef, messages: In
     if (drafts.length === 0) continue;
     const sourceMessageId = await repo.insertSourceMessage(tx, userId, { chatId: chat.id, ...message });
     for (const d of drafts) {
-      await repo.insertDetected(tx, userId, {
+      const detectedId = await repo.insertDetected(tx, userId, {
         chatId: chat.id,
         chatName: chat.name,
         chatColour: chat.colour,
@@ -41,6 +54,7 @@ export async function ingestMessages(userId: string, chat: ChatRef, messages: In
         uncertain: d.uncertain,
         rules: d.rules,
       });
+      await scheduleExpiry(tx, userId, detectedId, d.date, message.sentAt);
       stored++;
     }
   }
@@ -149,6 +163,7 @@ export async function review(db: Pool, userId: string, id: string, input: Review
       uncertain: row.uncertain.filter((m) => !reviewed.has(m)),
     };
     await repo.updateDetected(tx, userId, id, change);
+    if (change.date !== row.date) await scheduleExpiry(tx, userId, id, change.date, row.sent_at); // a new date moves the BR-14 expiry
     return detectedView({ ...row, ...change });
   });
 }
@@ -163,6 +178,17 @@ export type ConfirmedEventView = {
   time: string | null;
   place: string | null;
 };
+
+const snapshot = (userId: string, r: repo.ConfirmedRow, at: Date): EventSnapshot => ({
+  eventId: r.id,
+  userId,
+  title: r.title,
+  date: r.date,
+  time: r.time,
+  place: r.place,
+  sourceChatName: r.chat_name ?? 'Manual',
+  at: at.toISOString(),
+});
 
 const confirmedView = (r: repo.ConfirmedRow): ConfirmedEventView => ({
   id: r.id,
@@ -213,7 +239,8 @@ export async function confirm(db: Pool, userId: string, id: string, now: Date): 
     });
     await repo.deleteDetected(tx, userId, id);
     await repo.deleteSourceMessageIfUnused(tx, userId, row.source_message_id);
-    // shortcut: no EventConfirmed outbox message yet; S07 adds the jobs module, the outbox and Reminders.
+    await jobs.cancel(tx, EXPIRE, id);
+    await jobs.publish(tx, { type: 'EventConfirmed', payload: snapshot(userId, confirmed, now) });
     return confirmedView(confirmed);
   });
 }
@@ -225,6 +252,7 @@ export async function dismiss(db: Pool, userId: string, id: string): Promise<boo
     if (!row) return false;
     await repo.deleteDetected(tx, userId, id);
     await repo.deleteSourceMessageIfUnused(tx, userId, row.source_message_id);
+    await jobs.cancel(tx, EXPIRE, id);
     return true;
   });
 }
@@ -244,14 +272,17 @@ function pastRefusal(e: { date: string; time: string | null }, now: Date): PastR
 }
 
 /** AC-07.1, AC-07.2: a Manual Event needs a title and a date that is not past. */
-export async function createManual(db: Db, userId: string, input: DetailsInput, now: Date): Promise<ConfirmedEventView | Invalid | PastRefusal> {
+export async function createManual(db: Pool, userId: string, input: DetailsInput, now: Date): Promise<ConfirmedEventView | Invalid | PastRefusal> {
   const { details, invalid } = readDetails(input, ['title', 'date']);
   if (Object.keys(invalid).length) return { invalid };
   const event = { title: details.title!, date: details.date!, time: details.time ?? null, place: details.place ?? null };
   const past = pastRefusal(event, now);
   if (past) return past;
-  // shortcut: no EventConfirmed outbox message yet; S07 adds the outbox and Reminders.
-  return confirmedView(await repo.insertConfirmed(db, userId, { chat_id: null, chat_name: null, chat_colour: null, ...event }));
+  return withTransaction(db, async (tx) => {
+    const row = await repo.insertConfirmed(tx, userId, { chat_id: null, chat_name: null, chat_colour: null, ...event });
+    await jobs.publish(tx, { type: 'EventConfirmed', payload: snapshot(userId, row, now) });
+    return confirmedView(row);
+  });
 }
 
 export async function getConfirmed(db: Db, userId: string, id: string): Promise<ConfirmedEventView | undefined> {
@@ -276,13 +307,33 @@ export async function editConfirmed(
     const past = pastRefusal(next, now);
     if (past) return past;
     await repo.updateConfirmed(tx, userId, id, next);
-    // shortcut: no EventUpdated outbox message yet; S07 moves the Reminder, S11 the calendar copy.
+    await jobs.publish(tx, { type: 'EventUpdated', payload: snapshot(userId, { ...row, ...next }, now) });
     return confirmedView({ ...row, ...next });
   });
 }
 
 /** FR-12: false if this User has no such Event. */
-export async function deleteConfirmed(db: Db, userId: string, id: string): Promise<boolean> {
-  // shortcut: no EventDeleted outbox message yet; S07 cancels the Reminder, S11 removes the calendar copy.
-  return repo.deleteConfirmed(db, userId, id);
+export async function deleteConfirmed(db: Pool, userId: string, id: string): Promise<boolean> {
+  return withTransaction(db, async (tx) => {
+    if (!(await repo.deleteConfirmed(tx, userId, id))) return false;
+    await jobs.publish(tx, { type: 'EventDeleted', payload: { eventId: id, userId } });
+    return true;
+  });
+}
+
+// ---- Timed deletions (BR-05, BR-14) ----
+
+/** Removes an unreviewed Detected Event at its expiry, with its Source Message if no other Detected Event uses it. */
+async function expireDetected(tx: Db, job: jobs.Job, now: Date): Promise<void> {
+  const userId = job.userId!;
+  const row = await repo.getDetected(tx, userId, String(job.payload.detectedId), true);
+  if (!row) return; // confirmed or dismissed meanwhile
+  if (expiryOf(row.date, row.sent_at) > now) return; // a review moved the date while this job ran; review already queued the new expiry
+  await repo.deleteDetected(tx, userId, row.id);
+  await repo.deleteSourceMessageIfUnused(tx, userId, row.source_message_id);
+}
+
+/** Called once by the composition root (Q-1). */
+export function register(registry: jobs.Registry): void {
+  registry.registerHandler(EXPIRE, expireDetected);
 }

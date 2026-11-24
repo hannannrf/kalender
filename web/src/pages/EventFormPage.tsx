@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { EmptyState } from '../components/EmptyState';
+import { LEAD_MINUTES, leadText, sentText } from '../format';
 import pageStyles from './Page.module.css';
 import styles from './ReviewPage.module.css';
 import own from './EventFormPage.module.css';
@@ -14,11 +15,31 @@ type ConfirmedEvent = {
   date: string;
   time: string | null;
   place: string | null;
+  reminder?: Reminder | null;
+};
+type Reminder = {
+  leadMinutes: number | null;
+  defaultLeadMinutes: number;
+  enabled: boolean;
+  reminderAt: string | null;
+  status: 'scheduled' | 'none' | 'off' | 'sent' | 'late' | 'missed';
 };
 type Draft = { title: string; date: string; time: string | null; place: string };
 
 const EMPTY: Draft = { title: '', date: '', time: null, place: '' };
 const draftOf = (e: ConfirmedEvent): Draft => ({ title: e.title, date: e.date, time: e.time, place: e.place ?? '' });
+
+/** The Reminder choice on the form: "default", a Lead Time in minutes, or "off" (FR-10). */
+const choiceOf = (r: Reminder) => (!r.enabled ? 'off' : r.leadMinutes === null ? 'default' : String(r.leadMinutes));
+
+/** One line on what will happen, so the User never has to guess (BR-08). */
+function reminderLine(r: Reminder): string {
+  if (r.status === 'off') return 'No Reminder for this Event.';
+  if (r.status === 'none') return 'No Reminder: that time has already passed.';
+  if (r.status === 'scheduled') return `Reminder on ${sentText(r.reminderAt!)}.`;
+  if (r.status === 'missed') return 'The Reminder was missed.';
+  return 'The Reminder has been shown.';
+}
 
 export function EventFormPage() {
   const { id } = useParams();
@@ -30,6 +51,7 @@ export function EventFormPage() {
   const [problem, setProblem] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [reminderChoice, setReminderChoice] = useState('default');
 
   useEffect(() => {
     if (!editing) return;
@@ -37,6 +59,7 @@ export function EventFormPage() {
       (e) => {
         setEvent(e);
         setDraft(draftOf(e));
+        if (e.reminder) setReminderChoice(choiceOf(e.reminder));
       },
       (err) => setEvent(err instanceof ApiError && err.status === 404 ? 'gone' : 'error'),
     );
@@ -94,7 +117,14 @@ export function EventFormPage() {
     // Only the details the User changed are sent (FR-12).
     const before = draftOf(loaded);
     const body = Object.fromEntries(Object.entries(draft).filter(([k, v]) => v !== before[k as keyof Draft]));
-    return run(() => api(`/events/${loaded.id}`, { method: 'PATCH', body }));
+    const reminderChanged = loaded.reminder && reminderChoice !== choiceOf(loaded.reminder);
+    return run(async () => {
+      if (Object.keys(body).length > 0 || !reminderChanged) await api(`/events/${loaded.id}`, { method: 'PATCH', body });
+      if (reminderChanged) {
+        const reminder = reminderChoice === 'off' ? { enabled: false } : { enabled: true, leadMinutes: reminderChoice === 'default' ? null : Number(reminderChoice) };
+        await api(`/events/${loaded.id}/reminder`, { method: 'PUT', body: reminder });
+      }
+    });
   }
 
   const error = (field: string) => errors[field] && <p className={styles.fieldError}>{errors[field]}</p>;
@@ -145,6 +175,28 @@ export function EventFormPage() {
           <input id="place" value={draft.place} maxLength={40} onChange={(e) => change('place', e.target.value)} placeholder="No place" />
           {error('place')}
         </div>
+
+        {loaded && (
+          <div className={styles.field}>
+            <label htmlFor="reminder">Reminder</label>
+            {loaded.reminder ? (
+              <>
+                <select id="reminder" className={own.select} value={reminderChoice} onChange={(e) => setReminderChoice(e.target.value)}>
+                  <option value="default">Default ({leadText(loaded.reminder.defaultLeadMinutes)} before)</option>
+                  {LEAD_MINUTES.map((m) => (
+                    <option key={m} value={m}>
+                      {leadText(m)} before
+                    </option>
+                  ))}
+                  <option value="off">Off</option>
+                </select>
+                {reminderChoice === choiceOf(loaded.reminder) && <p className={styles.reason}>{reminderLine(loaded.reminder)}</p>}
+              </>
+            ) : (
+              <p className={styles.reason}>This Event was added before Reminders existed. Save changes to give it one.</p>
+            )}
+          </div>
+        )}
       </div>
 
       {problem && (

@@ -31,3 +31,7 @@ const sentFormat = new Intl.DateTimeFormat('en-GB', {
 
 /** An instant (ISO string) shown in PKT. */
 export const sentText = (iso: string) => sentFormat.format(new Date(iso));
+
+/** Lead Times the User may choose (BR-07). */
+export const LEAD_MINUTES = [10, 30, 60, 1440] as const;
+export const leadText = (minutes: number) => ({ 10: '10 minutes', 30: '30 minutes', 60: '1 hour', 1440: '1 day' })[minutes] ?? `${minutes} minutes`;
