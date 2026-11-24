@@ -1,4 +1,5 @@
 // Review a Detected Event (FR-06, BR-21): every Uncertain detail must be kept or changed before Confirm is enabled.
+// A Possible Duplicate (BR-04, BR-13) shows the existing Event and offers update, add or dismiss.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
@@ -9,6 +10,7 @@ import pageStyles from './Page.module.css';
 import styles from './ReviewPage.module.css';
 
 type Mark = 'date' | 'time' | 'event';
+type Existing = { kind: 'confirmed' | 'detected'; id: string; title: string; date: string; time: string | null; place: string | null };
 type Detail = {
   id: string;
   chat: { name: string; colour: number };
@@ -18,6 +20,7 @@ type Detail = {
   place: string | null;
   uncertain: Mark[];
   rules: string[];
+  possibleDuplicate: Existing | null;
   message: { sender: string; text: string; sentAt: string };
 };
 type Draft = { title: string; date: string; time: string | null; place: string };
@@ -85,6 +88,7 @@ export function ReviewPage() {
   const [reviewed, setReviewed] = useState<Set<Mark>>(new Set());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [problem, setProblem] = useState<string>();
+  const [notice, setNotice] = useState<string>();
   const [busy, setBusy] = useState(false);
   const dateInput = useRef<HTMLInputElement>(null);
   const timeInput = useRef<HTMLInputElement>(null);
@@ -127,7 +131,8 @@ export function ReviewPage() {
   const open = detail.uncertain.filter((m) => !reviewed.has(m));
   const needsDate = draft.date === '';
 
-  async function confirmEvent() {
+  /** Saves the edits and reviewed marks, then runs `next`. Errors land under the fields and in the problem line. */
+  async function saveThen(next: (d: Detail) => Promise<void>) {
     if (typeof detail !== 'object') return;
     setBusy(true);
     setProblem(undefined);
@@ -138,14 +143,30 @@ export function ReviewPage() {
     if (draft.place !== (detail.place ?? '')) body.place = draft.place;
     try {
       await api(`/detected-events/${detail.id}/review`, { method: 'POST', body });
-      await api(`/detected-events/${detail.id}/confirm`, { method: 'POST' });
-      navigate('/events');
+      await next(detail);
     } catch (err) {
       if (err instanceof ApiError && err.body.fields) setErrors(err.body.fields);
       setProblem(err instanceof ApiError && err.body.message ? err.body.message : err instanceof ApiError && err.status === 400 ? 'Fix the details marked above.' : 'Kalender could not reach the server. Try again.');
       setBusy(false);
     }
   }
+
+  const confirmEvent = () =>
+    saveThen(async (d) => {
+      await api(`/detected-events/${d.id}/confirm`, { method: 'POST' });
+      navigate('/events');
+    });
+
+  // BR-13: a Confirmed Event moves (the Events list then shows it); an older Detected Event leaves, and this one stays to confirm.
+  const updateExisting = (existing: Existing) =>
+    saveThen(async (d) => {
+      const body = { choice: 'update', existingId: existing.id };
+      const updated = await api<Omit<Detail, 'message'>>(`/detected-events/${d.id}/duplicate`, { method: 'POST', body });
+      if (existing.kind === 'confirmed') return navigate('/events');
+      setDetail({ ...d, ...updated });
+      setNotice(`The older "${existing.title}" was removed from your Inbox. Confirm this one when it is right.`);
+      setBusy(false);
+    });
 
   async function dismissEvent() {
     if (typeof detail !== 'object') return;
@@ -160,6 +181,8 @@ export function ReviewPage() {
   }
 
   const marked = (m: Mark) => open.includes(m);
+  const dup = detail.possibleDuplicate;
+  const blocked = open.length > 0 || needsDate; // the Confirm gate (FR-06, BR-21)
   const error = (field: string) => errors[field] && <p className={styles.fieldError}>{errors[field]}</p>;
 
   return (
@@ -177,6 +200,28 @@ export function ReviewPage() {
           {detail.message.sender}, {sentText(detail.message.sentAt)}
         </figcaption>
       </figure>
+
+      {dup && (
+        <section className={styles.duplicate} aria-labelledby="duplicate-title">
+          <h2 id="duplicate-title" className={styles.readAs}>
+            Possible Duplicate
+          </h2>
+          <p>You already have an Event from this Chat on the same day. It may be the same one.</p>
+          <div className={styles.existing} style={{ borderLeftColor: `var(--chat-${detail.chat.colour})` }}>
+            <p className={styles.existingTitle}>{dup.title}</p>
+            <p>
+              {dayText(dup.date)}, {dup.time ? timeText(dup.time) : 'All day'}
+            </p>
+            {dup.place && <p>{dup.place}</p>}
+            <p className={styles.reason}>{dup.kind === 'confirmed' ? 'Confirmed Event' : 'Waiting in your Inbox'}</p>
+          </div>
+          <p className={styles.reason}>
+            {dup.kind === 'confirmed'
+              ? 'Update moves that Event and its Reminder to the date and time below. Its title stays, and a new place replaces the old one.'
+              : 'Update removes the older one from your Inbox. This one stays for you to confirm.'}
+          </p>
+        </section>
+      )}
 
       <h2 className={styles.readAs}>Kalender read it as</h2>
       <div className={styles.fields}>
@@ -240,14 +285,22 @@ export function ReviewPage() {
         </div>
       </div>
 
+      <p className={styles.notice} role="status">
+        {notice}
+      </p>
       {problem && (
         <p className={styles.problem} role="alert">
           {problem}
         </p>
       )}
       <div className={styles.actions}>
-        <button type="button" className={styles.primary} disabled={busy || open.length > 0 || needsDate} onClick={confirmEvent}>
-          {busy ? 'Saving…' : confirmLabel(open, needsDate)}
+        {dup && (
+          <button type="button" className={styles.primary} disabled={busy || (dup.kind === 'confirmed' && blocked)} onClick={() => updateExisting(dup)}>
+            {busy ? 'Saving…' : dup.kind === 'confirmed' && blocked ? confirmLabel(open, needsDate).replace('to confirm', 'to update') : 'Update the existing Event'}
+          </button>
+        )}
+        <button type="button" className={dup ? styles.secondary : styles.primary} disabled={busy || blocked} onClick={confirmEvent}>
+          {busy && !dup ? 'Saving…' : dup && !blocked ? 'Add as a new Event' : confirmLabel(open, needsDate)}
         </button>
         <button type="button" className={styles.secondary} disabled={busy} onClick={dismissEvent}>
           Dismiss

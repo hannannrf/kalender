@@ -217,3 +217,35 @@
   background: var(--card);
   color: var(--text);
 }
+
+/* Possible Duplicate (BR-04): the existing Event as a small card with its Chat colour bar. */
+.duplicate {
+  display: grid;
+  gap: var(--space-2);
+  background: var(--card);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+}
+
+.existing {
+  display: grid;
+  gap: 2px;
+  background: var(--surface);
+  border-left: var(--bar-width) solid;
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+}
+
+.existingTitle {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* The result of replacing an older Detected Event; empty until then, so the live region is already in place. */
+.notice {
+  font-weight: 500;
+}
+
+.notice:empty {
+  display: none;
+}
