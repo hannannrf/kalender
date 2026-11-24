@@ -257,6 +257,16 @@ export async function dismiss(db: Pool, userId: string, id: string): Promise<boo
   });
 }
 
+/**
+ * BR-06, AC-04.1: on Revoke, deletes the Chat's unconfirmed Detected Events and their Source Messages and cancels their expiry.
+ * Runs inside the caller's transaction. Confirmed Events stay; they hold the Chat name, not message text.
+ */
+export async function deleteUnconfirmedForChat(tx: Db, userId: string, chatId: string): Promise<number> {
+  const ids = await repo.deleteDetectedForChat(tx, userId, chatId);
+  for (const id of ids) await jobs.cancel(tx, EXPIRE, id);
+  return ids.length;
+}
+
 export async function listUpcoming(db: Db, userId: string, now: Date): Promise<ConfirmedEventView[]> {
   const { date, time } = pktParts(now);
   return (await repo.listUpcoming(db, userId, date, time)).map(confirmedView);

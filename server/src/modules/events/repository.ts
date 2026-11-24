@@ -97,6 +97,13 @@ export async function deleteSourceMessageIfUnused(db: Db, userId: string, source
   );
 }
 
+/** BR-06: deletes a Chat's Detected Events and every Source Message from it. Returns the deleted Detected Event ids. */
+export async function deleteDetectedForChat(db: Db, userId: string, chatId: string): Promise<string[]> {
+  const res = await db.query<{ id: string }>('delete from detected_events where user_id = $1 and chat_id = $2 returning id', [userId, chatId]);
+  await db.query('delete from source_messages where user_id = $1 and chat_id = $2', [userId, chatId]);
+  return res.rows.map((r) => r.id);
+}
+
 export type ConfirmedRow = {
   id: string;
   chat_id: string | null;
