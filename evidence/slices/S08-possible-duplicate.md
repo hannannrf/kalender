@@ -115,3 +115,10 @@ Known limits:
 
 Found and fixed during the manual check:
 - After replacing an older Detected Event, the clicked button disappeared and nothing said what happened. The screen now shows "The older "Quiz" was removed from your Inbox. Confirm this one when it is right." in a status line.
+- CI on PR #9 (Postgres 17): green, including all 13 S08 tests and every S04, S06 and S07 test that timed out on Neon `dev`.
+- Deployed preview (https://kalender-e2ahr3tzo-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new throwaway account `s08-preview-<random>@test.kalender.app`:
+  - approved "S08 Preview" with one message from 7:00 pm today, "Meeting Friday 3pm in Room 4", and confirmed it as Meeting, Fri 27 Nov 15:00, Room 4;
+  - updated the Chat with a newer export that adds "Friday's meeting is now at 5pm" (7:30 pm). The new Detected Event lists `possibleDuplicate` as the Confirmed Meeting (AC-05.10);
+  - `{"choice":"merge"}` answered 400; update with an unknown `existingId` answered 422 `NOT_DUPLICATE`;
+  - update with the Meeting's id answered 200: the same id, title Meeting, 17:00, Room 4. The Events list holds only that Event, the Inbox is empty, and its Reminder is scheduled for 16:30 PKT (`2026-11-27T11:30:00Z`) (AC-06.4, D-28);
+  - signed out, `/duplicate` answered 401.
