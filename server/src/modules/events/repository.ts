@@ -45,22 +45,48 @@ export type DetectedRow = {
   place: string | null;
   uncertain: string[];
   rules: string[];
+  /** BR-04: the existing Event this one may duplicate, or nulls. */
+  dup_kind: 'confirmed' | 'detected' | null;
+  dup_id: string | null;
+  dup_title: string | null;
+  dup_date: string | null;
+  dup_time: string | null;
+  dup_place: string | null;
 };
+
+const DETECTED_COLUMNS = `d.id, d.chat_id, d.chat_name, d.chat_colour, d.title,
+  to_char(d.date, 'YYYY-MM-DD') as date, to_char(d.time, 'HH24:MI') as time, d.place, d.uncertain, d.rules,
+  dup.kind as dup_kind, dup.id as dup_id, dup.title as dup_title, to_char(dup.date, 'YYYY-MM-DD') as dup_date,
+  to_char(dup.time, 'HH24:MI') as dup_time, dup.place as dup_place`;
+
+/**
+ * BR-04, BR-13: computed on read (architecture 15). Same User, Source Chat id and date; Manual Events have no chat_id.
+ * A Confirmed Event comes first (the newest), else the latest Detected Event from an earlier message (ties by id).
+ * Needs `d` (the Detected Event) and `m` (its Source Message).
+ */
+const DUPLICATE_JOIN = `left join lateral (
+  select kind, id, title, date, time, place from (
+    select 'confirmed' as kind, c.id, c.title, c.date, c.time, c.place, 0 as rank, c.created_at as at
+      from confirmed_events c
+     where c.user_id = d.user_id and c.chat_id = d.chat_id and c.date = d.date
+    union all
+    select 'detected', o.id, o.title, o.date, o.time, o.place, 1, om.sent_at
+      from detected_events o join source_messages om on om.id = o.source_message_id
+     where o.user_id = d.user_id and o.chat_id = d.chat_id and o.date = d.date and (om.sent_at, o.id) < (m.sent_at, d.id)
+  ) x order by rank, at desc limit 1
+) dup on true`;
 
 /** Dates and times as text, so no server time zone can shift them. Dated first by date and time, then "Needs date". */
 export async function listDetected(db: Db, userId: string): Promise<DetectedRow[]> {
   const res = await db.query<DetectedRow>(
-    `select id, chat_id, chat_name, chat_colour, title,
-            to_char(date, 'YYYY-MM-DD') as date, to_char(time, 'HH24:MI') as time, place, uncertain, rules
-       from detected_events where user_id = $1
-      order by date asc nulls last, time asc nulls first, created_at asc`,
+    `select ${DETECTED_COLUMNS}
+       from detected_events d join source_messages m on m.id = d.source_message_id ${DUPLICATE_JOIN}
+      where d.user_id = $1
+      order by d.date asc nulls last, d.time asc nulls first, d.created_at asc`,
     [userId],
   );
   return res.rows;
 }
-
-const DETECTED_COLUMNS = `d.id, d.chat_id, d.chat_name, d.chat_colour, d.title,
-  to_char(d.date, 'YYYY-MM-DD') as date, to_char(d.time, 'HH24:MI') as time, d.place, d.uncertain, d.rules`;
 
 export type DetectedWithMessage = DetectedRow & { source_message_id: string; sender: string; text: string; sent_at: Date };
 
@@ -68,7 +94,7 @@ export type DetectedWithMessage = DetectedRow & { source_message_id: string; sen
 export async function getDetected(db: Db, userId: string, id: string, lock = false): Promise<DetectedWithMessage | undefined> {
   const res = await db.query<DetectedWithMessage>(
     `select ${DETECTED_COLUMNS}, d.source_message_id, m.sender, m.text, m.sent_at
-       from detected_events d join source_messages m on m.id = d.source_message_id
+       from detected_events d join source_messages m on m.id = d.source_message_id ${DUPLICATE_JOIN}
       where d.user_id = $1 and d.id = $2${lock ? ' for update of d' : ''}`,
     [userId, id],
   );

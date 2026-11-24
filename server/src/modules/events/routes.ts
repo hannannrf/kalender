@@ -49,9 +49,7 @@ router.post('/detected-events/:id/review', async (req, res) => {
   else res.json(result);
 });
 
-router.post('/detected-events/:id/confirm', async (req, res) => {
-  const id = idOf(req, res);
-  if (!id) return;
+async function confirmDetected(req: Request, res: Response, id: string) {
   const result = await service.confirm(db(), userIdOf(req), id, new Date());
   if (!result) notFound(res);
   else if ('refused' in result) res.status(422).json({ error: result.refused, message: result.message, fields: result.fields });
@@ -59,13 +57,41 @@ router.post('/detected-events/:id/confirm', async (req, res) => {
     await dispatchNow();
     res.status(201).json(result);
   }
+}
+
+async function dismissDetected(req: Request, res: Response, id: string) {
+  if (await service.dismiss(db(), userIdOf(req), id)) res.status(204).end();
+  else notFound(res);
+}
+
+router.post('/detected-events/:id/confirm', async (req, res) => {
+  const id = idOf(req, res);
+  if (id) await confirmDetected(req, res, id);
 });
 
 router.post('/detected-events/:id/dismiss', async (req, res) => {
   const id = idOf(req, res);
+  if (id) await dismissDetected(req, res, id);
+});
+
+/** FR-06, BR-04: the Possible Duplicate choice. Add and dismiss are Confirm and Dismiss; update names the Event the User saw. */
+router.post('/detected-events/:id/duplicate', async (req, res) => {
+  const id = idOf(req, res);
   if (!id) return;
-  if (await service.dismiss(db(), userIdOf(req), id)) res.status(204).end();
-  else notFound(res);
+  const { choice, existingId } = req.body ?? {};
+  if (choice === 'add') return confirmDetected(req, res, id);
+  if (choice === 'dismiss') return dismissDetected(req, res, id);
+  if (choice !== 'update' || typeof existingId !== 'string') {
+    res.status(400).json({ error: 'invalid', fields: { choice: 'Choose add, update or dismiss. Update needs existingId.' } });
+    return;
+  }
+  const result = await service.updateExisting(db(), userIdOf(req), id, existingId, new Date());
+  if (!result) notFound(res);
+  else if ('refused' in result) res.status(422).json({ error: result.refused, message: result.message, fields: result.fields });
+  else {
+    await dispatchNow();
+    res.json(result);
+  }
 });
 
 router.get('/events', async (req, res) => {

@@ -150,6 +150,8 @@ Found and fixed during the manual check: the result of an update first appeared 
 
 PR #8 merged into `main` with a merge commit, tagged `S05-accepted`; CI on `main` is Gate 4. No migration in this slice. `fflate` is added to `server`.
 
+After merge: CI on `main` passed at `c97a0ee`, and the Vercel deployment of that commit succeeded and is aliased to https://kalender-tan-eta.vercel.app. `/api/health` answers `{"status":"ok","db":"ok"}`. `GET /api/chats`, `POST /api/chats/<id>/uploads` and `DELETE /api/chats/<id>` answer 401 when signed out.
+
 ## 9. Context updated
 
 `plan.md` v08 (copy in `docs/plan-history/plan-v08.md`): S05 Accepted and marked HITL, O-3 iPhone half done and Android half moved to before Gate 5. Row 10 added to `evidence/workflow-evidence-log.md`.

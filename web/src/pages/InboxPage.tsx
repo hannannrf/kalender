@@ -16,6 +16,7 @@ type DetectedEvent = {
   time: string | null; // HH:MM in PKT; null is All-day
   place: string | null;
   uncertain: ('date' | 'time' | 'event')[];
+  possibleDuplicate: { id: string } | null; // BR-04
 };
 
 function groupByChat(events: DetectedEvent[]) {
@@ -58,6 +59,7 @@ function EventCard({ event }: { event: DetectedEvent }) {
             Check this
           </p>
         )}
+        {event.possibleDuplicate && <p className={styles.duplicate}>Possible Duplicate</p>}
       </Link>
     </li>
   );

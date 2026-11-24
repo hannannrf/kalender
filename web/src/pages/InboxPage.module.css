@@ -87,3 +87,15 @@
   padding: var(--space-3);
   font-weight: 500;
 }
+
+/* BR-04: a hint, not a warning, so neutral and in words. */
+.duplicate {
+  justify-self: start;
+  margin-top: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--text-md);
+  font-weight: 500;
+}

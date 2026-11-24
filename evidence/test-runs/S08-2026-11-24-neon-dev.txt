@@ -1,0 +1,318 @@
+
+> lint
+> eslint .
+
+
+> typecheck
+> tsc -p server --noEmit && tsc -p web --noEmit && tsc -p api --noEmit
+
+
+> test
+> vitest run --root server
+
+[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (server/vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.[39m
+
+ RUN  v5.1.1 D:/ISE PROJECT/kalender/server
+
+(node:24040) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30628) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25260) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16600) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18184) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30228) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27000) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12588) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20280) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13732) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/modules/events/manual.test.ts (10 tests | 2 failed) 186116ms
+   ❯ Manual Events (FR-07) (4)
+     × S06-2 EP/BVA title, date, time and place limits 30014ms
+   ❯ edit and delete a Confirmed Event (FR-12) (6)
+     × S06-7 editing keeps the Source Chat; a Manual Event stays Manual 30022ms
+ ❯ src/modules/events/duplicate.test.ts (13 tests | 2 failed) 263085ms
+   ❯ Possible Duplicate (BR-04, BR-13) (13)
+     × S08-2 BR-13: another Chat, a Manual Event, and the day before or after are not matches 30009ms
+     × S08-4 AC-06.4: update moves the Confirmed Event and its Reminder, keeps its title and place, and creates no new Event 30007ms
+ ❯ src/modules/events/review.test.ts (15 tests | 2 failed) 313965ms
+   ❯ review and confirm (FR-06, FR-11) (15)
+     × S04-2 AC-06.2 an edited time is the confirmed time 30012ms
+     × S04-6 AC-06.8 accepting 17:00 or changing to 05:00 clears the mark, then confirm works in one action 30003ms
+ ❯ test/reminders.test.ts (16 tests | 6 failed) 340841ms
+   ❯ Reminders (FR-09, FR-10) (12)
+     × S07-1 AC-09.1 a 15:00 Event with 30 minutes is presented at 14:30, not at 14:29, with both times recorded 30014ms
+     × S07-3 AC-09.3 a due Reminder is shown in the app with no push set up, and Seen removes it 30007ms
+     × S07-2 AC-09.2 a deleted Event is never presented, even when EventDeleted is still in the outbox at tick time 30016ms
+     × S07-4 AC-09.4 BR-08 no Reminder when its time has passed at confirm or edit; the same minute still counts 30008ms
+     × S07-6 AC-10.1 after the default becomes 1 hour, a new Event is reminded 1 hour before (dispatched before the route answers) 10848ms
+     × S07-7 AC-10.2 a Reminder turned off is never presented; turned back on it is scheduled again 30007ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-1 AC-09.1 a 15:00 Event with 30 minutes is presented at 14:30, not at 14:29, with both times recorded
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ test/reminders.test.ts:48:3
+     46|
+     47| describe.skipIf(!hasDb)('Reminders (FR-09, FR-10)', () => {
+     48|   it('S07-1 AC-09.1 a 15:00 Event with 30 minutes is presented at 14:3…
+       |   ^
+     49|     const { agent, userId } = await user();
+     50|     const id = await event(userId, { date: D(1), time: '15:00' }, T(1,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-3 AC-09.3 a due Reminder is shown in the app with no push set up, and Seen removes it
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ test/reminders.test.ts:59:3
+     57|   });
+     58|
+     59|   it('S07-3 AC-09.3 a due Reminder is shown in the app with no push se…
+       |   ^
+     60|     const { agent, userId } = await user();
+     61|     await event(userId, { date: D(1), time: '16:00' }, T(1, 14, 0));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-2 AC-09.2 a deleted Event is never presented, even when EventDeleted is still in the outbox at tick time
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ test/reminders.test.ts:69:3
+     67|   });
+     68|
+     69|   it('S07-2 AC-09.2 a deleted Event is never presented, even when Even…
+       |   ^
+     70|     const { agent, userId } = await user();
+     71|     const id = await event(userId, { date: D(2), time: '15:00' }, T(2,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-4 AC-09.4 BR-08 no Reminder when its time has passed at confirm or edit; the same minute still counts
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ test/reminders.test.ts:78:3
+     76|   });
+     77|
+     78|   it('S07-4 AC-09.4 BR-08 no Reminder when its time has passed at conf…
+       |   ^
+     79|     const { agent, userId } = await user();
+     80|     // Confirmed in the Reminder Time's own minute: scheduled, and a t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-6 AC-10.1 after the default becomes 1 hour, a new Event is reminded 1 hour before (dispatched before the route answers)
+AssertionError: expected null to match object { leadMinutes: null, …(2) }
+
+- Expected:
+{
+  "defaultLeadMinutes": 60,
+  "leadMinutes": null,
+  "status": "scheduled",
+}
+
++ Received:
+null
+
+ ❯ test/reminders.test.ts:108:32
+    106|     const made = await agent.post('/api/events').send({ title: 'Semina…
+    107|     const read = await agent.get(`/api/events/${made.body.id}`);
+    108|     expect(read.body.reminder).toMatchObject({ leadMinutes: null, defa…
+       |                                ^
+    109|     expect(read.body.reminder.reminderAt).toBe(pktToUtc(...(tomorrow.s…
+    110|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-7 AC-10.2 a Reminder turned off is never presented; turned back on it is scheduled again
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ test/reminders.test.ts:112:3
+    110|   });
+    111|
+    112|   it('S07-7 AC-10.2 a Reminder turned off is never presented; turned b…
+       |   ^
+    113|     const { agent, userId } = await user();
+    114|     const id = await event(userId, { date: D(7), time: '15:00' }, T(7,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  src/modules/events/duplicate.test.ts > Possible Duplicate (BR-04, BR-13) > S08-2 BR-13: another Chat, a Manual Event, and the day before or after are not matches
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/modules/events/duplicate.test.ts:61:3
+     59|   });
+     60|
+     61|   it('S08-2 BR-13: another Chat, a Manual Event, and the day before or…
+       |   ^
+     62|     const { agent, userId, detected } = await user();
+     63|     const A = chat();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  src/modules/events/duplicate.test.ts > Possible Duplicate (BR-04, BR-13) > S08-4 AC-06.4: update moves the Confirmed Event and its Reminder, keeps its title and place, and creates no new Event
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/modules/events/duplicate.test.ts:88:3
+     86|   });
+     87|
+     88|   it('S08-4 AC-06.4: update moves the Confirmed Event and its Reminder…
+       |   ^
+     89|     const { agent, userId, confirmed, dup, detected, upcoming } = awai…
+     90|     const res = await agent.post(`/api/detected-events/${dup.id}/dupli…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  src/modules/events/manual.test.ts > Manual Events (FR-07) > S06-2 EP/BVA title, date, time and place limits
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/modules/events/manual.test.ts:69:3
+     67|   });
+     68|
+     69|   it('S06-2 EP/BVA title, date, time and place limits', async () => {
+       |   ^
+     70|     const { agent } = await user();
+     71|     const send = (body: object) => agent.post('/api/events').send({ ti…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  src/modules/events/manual.test.ts > edit and delete a Confirmed Event (FR-12) > S06-7 editing keeps the Source Chat; a Manual Event stays Manual
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/modules/events/manual.test.ts:140:3
+    138|   });
+    139|
+    140|   it('S06-7 editing keeps the Source Chat; a Manual Event stays Manual…
+       |   ^
+    141|     const { agent } = await user();
+    142|     const chatEvent = await fromChat(agent);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  src/modules/events/review.test.ts > review and confirm (FR-06, FR-11) > S04-2 AC-06.2 an edited time is the confirmed time
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/modules/events/review.test.ts:85:3
+     83|   });
+     84|
+     85|   it('S04-2 AC-06.2 an edited time is the confirmed time', async () =>…
+       |   ^
+     86|     const { agent, byTitle } = await setup();
+     87|     const id = byTitle('Meeting').id;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  src/modules/events/review.test.ts > review and confirm (FR-06, FR-11) > S04-6 AC-06.8 accepting 17:00 or changing to 05:00 clears the mark, then confirm works in one action
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/modules/events/review.test.ts:128:3
+    126|   });
+    127|
+    128|   it('S04-6 AC-06.8 accepting 17:00 or changing to 05:00 clears the ma…
+       |   ^
+    129|     const { agent, byTitle } = await setup();
+    130|     const kept = byTitle('Project meeting').id;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  4 failed | 10 passed (14)
+      Tests  12 failed | 174 passed | 2 skipped (188)
+   Start at  21:02:04
+   Duration  360.68s (tests 99%, import 1%)
+
+
+> build
+> vite build
+
+[36mvite v8.3.8 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 47 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.96 kB │ gzip:  0.50 kB
+dist/assets/index-CI0u70FL.css   19.01 kB │ gzip:  3.78 kB
+dist/assets/index-BIwhAEDE.js   300.64 kB │ gzip: 93.53 kB
+
+[32m✓ built in 410ms[39m

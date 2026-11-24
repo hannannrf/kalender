@@ -70,7 +70,11 @@ export type DetectedEventView = {
   place: string | null;
   uncertain: string[];
   rules: string[];
+  /** BR-04: the existing Event this one may duplicate. Only a hint (BR-13). */
+  possibleDuplicate: ExistingEvent | null;
 };
+
+export type ExistingEvent = { kind: 'confirmed' | 'detected'; id: string; title: string; date: string; time: string | null; place: string | null };
 
 const detectedView = (r: repo.DetectedRow): DetectedEventView => ({
   id: r.id,
@@ -81,6 +85,9 @@ const detectedView = (r: repo.DetectedRow): DetectedEventView => ({
   place: r.place,
   uncertain: r.uncertain,
   rules: r.rules,
+  possibleDuplicate: r.dup_id
+    ? { kind: r.dup_kind!, id: r.dup_id, title: r.dup_title!, date: r.dup_date!, time: r.dup_time, place: r.dup_place }
+    : null,
 });
 
 export async function listDetected(db: Db, userId: string): Promise<DetectedEventView[]> {
@@ -164,7 +171,7 @@ export async function review(db: Pool, userId: string, id: string, input: Review
     };
     await repo.updateDetected(tx, userId, id, change);
     if (change.date !== row.date) await scheduleExpiry(tx, userId, id, change.date, row.sent_at); // a new date moves the BR-14 expiry
-    return detectedView({ ...row, ...change });
+    return detectedView((await repo.getDetected(tx, userId, id))!); // read again: a new date can change the Possible Duplicate
   });
 }
 
@@ -214,32 +221,42 @@ function pastDetail(date: string, time: string | null, now: Date): 'date' | 'tim
   return undefined;
 }
 
+/** FR-06, BR-21, BR-16: why a Detected Event cannot yet become (or change) a Confirmed Event, if anything stops it. */
+function confirmGate(row: repo.DetectedRow, now: Date): ConfirmRefusal | undefined {
+  if (row.uncertain.length) {
+    const fields = Object.fromEntries(row.uncertain.map((m) => [m, CHECK[m]]));
+    return { refused: 'NEEDS_REVIEW', message: 'Check every highlighted detail before confirming.', fields };
+  }
+  if (row.date === null) return { refused: 'NEEDS_DATE', message: 'Add a date before confirming.', fields: { date: 'Add a date.' } };
+  const past = pastDetail(row.date, row.time, now);
+  if (past) return { refused: 'PAST', message: 'This Event is in the past. Change the date or time, or dismiss it.', fields: { [past]: `This ${past} has passed.` } };
+  return undefined;
+}
+
+/** BR-05: a Detected Event leaves with its Source Message (if no other Detected Event uses it) and its expiry job. */
+async function removeDetected(tx: Db, userId: string, row: repo.DetectedWithMessage): Promise<void> {
+  await repo.deleteDetected(tx, userId, row.id);
+  await repo.deleteSourceMessageIfUnused(tx, userId, row.source_message_id);
+  await jobs.cancel(tx, EXPIRE, row.id);
+}
+
 /** The gate of FR-06 and BR-21, then one transaction: Confirmed Event in, Detected Event and unused message out. */
 export async function confirm(db: Pool, userId: string, id: string, now: Date): Promise<ConfirmedEventView | ConfirmRefusal | undefined> {
   return withTransaction(db, async (tx) => {
     const row = await repo.getDetected(tx, userId, id, true);
     if (!row) return undefined;
-    if (row.uncertain.length) {
-      const fields = Object.fromEntries(row.uncertain.map((m) => [m, CHECK[m]]));
-      return { refused: 'NEEDS_REVIEW', message: 'Check every highlighted detail before confirming.', fields } as const;
-    }
-    if (row.date === null) return { refused: 'NEEDS_DATE', message: 'Add a date before confirming.', fields: { date: 'Add a date.' } } as const;
-    const past = pastDetail(row.date, row.time, now);
-    if (past) {
-      return { refused: 'PAST', message: 'This Event is in the past. Change the date or time, or dismiss it.', fields: { [past]: `This ${past} has passed.` } } as const;
-    }
+    const refusal = confirmGate(row, now);
+    if (refusal) return refusal;
     const confirmed = await repo.insertConfirmed(tx, userId, {
       chat_id: row.chat_id,
       chat_name: row.chat_name,
       chat_colour: row.chat_colour,
       title: row.title,
-      date: row.date,
+      date: row.date!,
       time: row.time,
       place: row.place,
     });
-    await repo.deleteDetected(tx, userId, id);
-    await repo.deleteSourceMessageIfUnused(tx, userId, row.source_message_id);
-    await jobs.cancel(tx, EXPIRE, id);
+    await removeDetected(tx, userId, row);
     await jobs.publish(tx, { type: 'EventConfirmed', payload: snapshot(userId, confirmed, now) });
     return confirmedView(confirmed);
   });
@@ -250,10 +267,54 @@ export async function dismiss(db: Pool, userId: string, id: string): Promise<boo
   return withTransaction(db, async (tx) => {
     const row = await repo.getDetected(tx, userId, id, true);
     if (!row) return false;
-    await repo.deleteDetected(tx, userId, id);
-    await repo.deleteSourceMessageIfUnused(tx, userId, row.source_message_id);
-    await jobs.cancel(tx, EXPIRE, id);
+    await removeDetected(tx, userId, row);
     return true;
+  });
+}
+
+// ---- Possible Duplicate (FR-06, BR-04, BR-13) ----
+
+export type DuplicateRefusal = ConfirmRefusal | { refused: 'NOT_DUPLICATE'; message: string; fields: Record<string, string> };
+
+const NOT_DUPLICATE = {
+  refused: 'NOT_DUPLICATE',
+  message: 'This Event no longer matches that existing Event. Open it again to see your choices.',
+  fields: {},
+} as const;
+
+/**
+ * "Update the existing Event" (BR-13). `existingId` is the Event the User saw, and it must still be the match.
+ * - Existing Confirmed Event: needs the Confirm gate. It takes the new date and time, and the new place only if there is
+ *   one (D-28); its title stays. `EventUpdated` moves its Reminder and calendar copy. The Detected Event leaves.
+ * - Existing Detected Event: it is replaced, so it leaves. The new one stays in the Inbox for review.
+ * Returns the updated Confirmed Event, or the Detected Event that stays.
+ */
+export async function updateExisting(
+  db: Pool,
+  userId: string,
+  id: string,
+  existingId: string,
+  now: Date,
+): Promise<ConfirmedEventView | DetectedEventView | DuplicateRefusal | undefined> {
+  return withTransaction(db, async (tx) => {
+    const row = await repo.getDetected(tx, userId, id, true);
+    if (!row) return undefined;
+    if (row.dup_id !== existingId) return NOT_DUPLICATE;
+    if (row.dup_kind === 'detected') {
+      const old = await repo.getDetected(tx, userId, existingId, true);
+      if (!old) return NOT_DUPLICATE; // removed since the match was read
+      await removeDetected(tx, userId, old);
+      return detectedView((await repo.getDetected(tx, userId, id))!);
+    }
+    const refusal = confirmGate(row, now);
+    if (refusal) return refusal;
+    const existing = await repo.getConfirmed(tx, userId, existingId, true);
+    if (!existing) return NOT_DUPLICATE; // deleted since the match was read
+    const updated = { ...existing, date: row.date!, time: row.time, place: row.place ?? existing.place };
+    await repo.updateConfirmed(tx, userId, existingId, updated);
+    await removeDetected(tx, userId, row);
+    await jobs.publish(tx, { type: 'EventUpdated', payload: snapshot(userId, updated, now) });
+    return confirmedView(updated);
   });
 }
 
