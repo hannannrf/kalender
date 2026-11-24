@@ -114,3 +114,30 @@ Known limits:
 - An Event written only in a photo caption is missed (decision 2).
 - No real Android export yet; O-3 stays open for one before Gate 5.
 - The 20 MB guard reads the size the `.zip` declares for `_chat.txt`. `fflate` inflates into a buffer of that size, so a `.zip` that understates it gets a cut-off chat, never a larger one. Checked by hand: a 30 MB `_chat.txt` declared as 100 bytes came out as 100 bytes.
+
+## 6. Checks
+
+- **CI on PR #8** (Postgres 17 service): lint, typecheck, **173 passed, 2 skipped**, build.
+- **New tests:** 5 in `ingestion/ingestion.test.ts` (S05-1, S05-2 twice, S05-3 twice) and 12 in `chats/update.test.ts` (S05-1 to S05-12 and "needs a session"). The old test "refuses anything that is not a .txt for now" became the S05-3 file-type test.
+- **Local against Neon `dev`:** `evidence/test-runs/S05-2026-11-24-neon-dev.txt` holds lint, typecheck, tests and build. Two full runs each had **171 passed, 2 failed, 2 skipped**. Both failures are in S07's `reminders.test.ts`: S07-4 hit the 30-second test limit, and in S07-6 the Reminder was not yet scheduled when the route answered, because dispatch before the answer has a 2-second budget.
+  - Neon `dev` was slow during these runs: `reminders.test.ts` alone took 268 s, and all 16 of its tests passed.
+  - To check whether S05 caused it, the suite was run once more on Neon `dev` **without** `chats/update.test.ts`. It failed worse: 4 timeouts (S04-6, S07-2, S07-4 and S07-6), 157 passed.
+  - So these failures come from database speed, not from S05 code. On CI, with a local Postgres, all 173 pass. The timing-sensitive tests are recorded as a risk for S13.
+- **Deployed preview** (https://kalender-pwancccq6-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new test account:
+  - preview of the real `.zip` gives "Binary tree"; approving it with 7 days reads 37 messages (201);
+  - the same `.zip` again as an update reads 0 and says there was nothing new (200);
+  - "Society Core" without a date order is refused with `NEEDS_DATE_ORDER`; a text file renamed to `.zip` is refused as damaged;
+  - the "Ammi" export as an update of "SE-3D Class" is refused with `WRONG_CHAT`; the `v2` export named "… (1).txt" is accepted and moves the last upload time;
+  - the "Ammi" export as an update of "Binary tree" is refused with `DATE_ORDER_MISMATCH` (design choice in section 5);
+  - Revoke answers 204; then the Chat list and Detected Events are empty, an update answers `CHAT_NOT_APPROVED`, an unknown id answers 404, and signed out answers 401.
+- **Manual check at 375 x 812**, local PWA and API on Neon `dev`, test account. The file picker was driven from the browser console with the fixture files, because the browser pane cannot open the phone's file dialog:
+  - "Society Core" asked "How does your phone write dates?" with day/month first, then approved;
+  - "SE-3D Class": the "Ammi" file showed "This export is of another Chat. Upload the export of SE-3D Class." in its card; the `v2` file showed "Updated. No new messages since the last upload." (this account approved it on 23 Nov, so the October messages are before its Start Point);
+  - the real "Binary tree" `.zip` needed no date-order question and read 37 messages;
+  - Revoke asked with the agreed wording, then showed "Society Core revoked. Approve it again to read new messages." at the top. Both test Chats added in this check were revoked afterwards.
+
+| Date order | Wrong Chat | Update | iPhone `.zip` | Revoke | Revoked |
+|---|---|---|---|---|---|
+| ![Date order](S05/date-order-question.jpg) | ![Wrong Chat](S05/update-wrong-chat.jpg) | ![Update](S05/update-result.jpg) | ![iPhone zip](S05/iphone-zip-approved.jpg) | ![Revoke](S05/revoke-confirm.jpg) | ![Revoked](S05/revoked.jpg) |
+
+Found and fixed during the manual check: the result of an update first appeared only at the top of the screen, out of view when the Chat was further down. It now shows in that Chat's card. After a Revoke the card disappears, so the notice at the top takes focus instead.
