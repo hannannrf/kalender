@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v08 (24 Nov 2026) |
+| Plan version | v09 (24 Nov 2026) |
+| Changes from v08 | S08 Accepted (Possible Duplicate with add, update or dismiss). It ran as HITL, not AFK, because Gate 1 needed a BR-13 reading (D-28: a missing place keeps the existing place). The calendar part of AC-06.4 stays with S11 |
 | Changes from v07 | S05 Accepted (Chat update, iPhone `.zip`, date-order question, Revoke; HITL, not AFK); O-3 iPhone half done with a scrubbed real export, Android half still open |
 | Changes from v06 | S07 Accepted (jobs, outbox, tick, in-app Reminders, Lead Time, timed deletions); O-5 still open, now needed before Gate 5 |
 | Changes from v05 | S06 Accepted (Manual Events, edit and delete a Confirmed Event); run before S05, which waits for O-3 |
@@ -60,7 +61,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 | S05 | Update an Approved Chat, iPhone `.zip`, date-order question, Approved Chats list, Revoke | FR-03, FR-04, BR-02, BR-06, BR-15 | 02.2, 02.4, 03.1..03.3, 04.1, 04.2 | S02, S03 | HITL | M | Wed 25 | Zain Amjad | Accepted | G1 G2 G3 pass |
 | S06 | Manual Event; edit and delete a Confirmed Event | FR-07, FR-12, BR-16 | 07.1, 07.2, 12.1*, 12.2* | S04 | AFK | M | Wed 25 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S07 | Jobs, tick, in-app Reminders, Lead Time settings, timed deletions | FR-09 (in-app), FR-10, BR-05, BR-07, BR-08, BR-14, BR-19, NFR-03 | 09.1..09.5, 10.1..10.4, 05.11, 06.6 | S04, S06 | HITL | M | Thu 26 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
-| S08 | Possible Duplicate: add new, update existing, or dismiss | BR-04, BR-13 | 05.10, 06.4* | S04 | AFK | M | Thu 26 | Zain Amjad | Planned | – |
+| S08 | Possible Duplicate: add new, update existing, or dismiss | BR-04, BR-13 | 05.10, 06.4* | S04 | HITL | M | Thu 26 | Zain Amjad | Accepted | G1 G2 G3 pass |
 | S09 | Delete account and everything it owns | FR-13, MF-07 | 13.1, 13.3 | S07 | AFK | M | Thu 26 | Muhammad Areeb | Planned | – |
 | S10 | Push notifications through the service worker; installable PWA | FR-09 (push), C-05 | 09.3 | S07 | HITL | S | Thu 26 | Muhammad Areeb | Planned | – |
 | S11 | Connect Google Calendar: one-way copies, retries, "Calendar update failed", unlink | FR-08, FR-13 (unlink), BR-09, BR-10, BR-18 | 08.1..08.3, 12.1, 12.2, 13.2, 06.4 | S07 | HITL | S | Thu 26 | Zain Amjad | Planned | – |

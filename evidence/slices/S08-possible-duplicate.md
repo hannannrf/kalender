@@ -122,3 +122,15 @@ Found and fixed during the manual check:
   - `{"choice":"merge"}` answered 400; update with an unknown `existingId` answered 422 `NOT_DUPLICATE`;
   - update with the Meeting's id answered 200: the same id, title Meeting, 17:00, Room 4. The Events list holds only that Event, the Inbox is empty, and its Reminder is scheduled for 16:30 PKT (`2026-11-27T11:30:00Z`) (AC-06.4, D-28);
   - signed out, `/duplicate` answered 401.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 24 Nov 2026 ("Accept, merge and tag"). Reason: criteria S08-1 to S08-11 pass in CI, on the deployed preview and in the manual phone-size check. Accepted with these known limits: the calendar copy part of AC-06.4 waits for S11; the Inbox count stays one too high after a replace until the next screen change; a Revoked and re-approved Chat is a new Source Chat.
+
+## 8. Integrate
+
+PR #9 merged into `main` with a merge commit, tagged `S08-accepted`; CI on `main` is Gate 4. No migration and no new dependency in this slice.
+
+## 9. Context updated
+
+`plan.md` v09 (copy in `docs/plan-history/plan-v09.md`): S08 Accepted and marked HITL. D-28 added to `docs/decisions.md`. Row 11 added to `evidence/workflow-evidence-log.md`.
