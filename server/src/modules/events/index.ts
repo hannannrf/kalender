@@ -11,6 +11,7 @@ export {
   ingestMessages,
   listDetected,
   listUpcoming,
+  register,
   review,
   type ChatRef,
   type ConfirmedEventView,

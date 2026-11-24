@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v06 (24 Nov 2026) |
+| Plan version | v07 (24 Nov 2026) |
+| Changes from v06 | S07 Accepted (jobs, outbox, tick, in-app Reminders, Lead Time, timed deletions); O-5 still open, now needed before Gate 5 |
 | Changes from v05 | S06 Accepted (Manual Events, edit and delete a Confirmed Event); run before S05, which waits for O-3 |
 | Changes from v04 | S04 Accepted (review, confirm, dismiss, upcoming Events list) |
 | Changes from v03 | S03 Accepted (NFR-05 gate passes 80 of 80; CI re-scores it with `evaluate.py`) |
@@ -32,7 +33,7 @@ Ship Kalender: a phone-first PWA where a student uploads WhatsApp Chat Exports, 
 | O-2 | Vercel project linked to the GitHub repo, env vars set | Abdul Hannan Rauf | Done 23 Nov |
 | O-3 | One real Android and one real iPhone export, names replaced (G-06). One iPhone export received 23 Nov (month/day, two-digit year), not yet anonymised | Zain Amjad | Before `ingestion` is accepted in S05 |
 | O-4 | Google Cloud OAuth client (Testing mode) | Zain Amjad | Before S11 |
-| O-5 | cron-job.org job calling `/internal/tick` every minute | Abdul Hannan Rauf | Before S07 is accepted |
+| O-5 | cron-job.org job calling `/internal/tick` every minute | Abdul Hannan Rauf | Before Gate 5 (S13); S07 accepted without it on 24 Nov |
 | O-6 | NFR-04 session with Mahd and two classmates on 26 Nov (G-07) | Muhammad Areeb | S13 |
 | O-7 | Slice owners below are a proposal; the team confirms them | Team | Before S01 |
 
@@ -57,7 +58,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 | S04 | Review a Detected Event: resolve Uncertain details, edit, confirm, dismiss; upcoming Events list | FR-06, FR-11, BR-05, BR-16 | 06.1..06.3, 06.5, 06.7, 06.8, 11.1, 11.2 | S03 | HITL | M | Wed 25 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S05 | Update an Approved Chat, iPhone `.zip`, date-order question, Approved Chats list, Revoke | FR-03, FR-04, BR-02, BR-06, BR-15 | 02.2, 02.4, 03.1..03.3, 04.1, 04.2 | S02, S03 | AFK | M | Wed 25 | Zain Amjad | Planned | – |
 | S06 | Manual Event; edit and delete a Confirmed Event | FR-07, FR-12, BR-16 | 07.1, 07.2, 12.1*, 12.2* | S04 | AFK | M | Wed 25 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
-| S07 | Jobs, tick, in-app Reminders, Lead Time settings, timed deletions | FR-09 (in-app), FR-10, BR-05, BR-07, BR-08, BR-14, BR-19, NFR-03 | 09.1..09.5, 10.1..10.4, 05.11, 06.6 | S04, S06 | HITL | M | Thu 26 | Abdul Hannan Rauf | Planned | – |
+| S07 | Jobs, tick, in-app Reminders, Lead Time settings, timed deletions | FR-09 (in-app), FR-10, BR-05, BR-07, BR-08, BR-14, BR-19, NFR-03 | 09.1..09.5, 10.1..10.4, 05.11, 06.6 | S04, S06 | HITL | M | Thu 26 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
 | S08 | Possible Duplicate: add new, update existing, or dismiss | BR-04, BR-13 | 05.10, 06.4* | S04 | AFK | M | Thu 26 | Zain Amjad | Planned | – |
 | S09 | Delete account and everything it owns | FR-13, MF-07 | 13.1, 13.3 | S07 | AFK | M | Thu 26 | Muhammad Areeb | Planned | – |
 | S10 | Push notifications through the service worker; installable PWA | FR-09 (push), C-05 | 09.3 | S07 | HITL | S | Thu 26 | Muhammad Areeb | Planned | – |

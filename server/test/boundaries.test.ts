@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest';
 const eslint = new ESLint({ cwd: resolve(__dirname, '../..') });
 const file = resolve(__dirname, '../src/modules/chats/service.ts');
 
-async function errors(code: string) {
-  const [result] = await eslint.lintText(code, { filePath: file });
+async function errors(code: string, filePath = file) {
+  const [result] = await eslint.lintText(code, { filePath });
   return result.messages.filter((m) => m.ruleId === 'no-restricted-imports').length;
 }
 
@@ -26,5 +26,14 @@ describe('module boundary lint rule', () => {
 
   it('rejects importing a file inside another module', async () => {
     expect(await errors("import { a } from '../events/service';\nexport const x = a;\n")).toBe(1);
+  });
+
+  it('S07: jobs imports no module; reminders may import only jobs', async () => {
+    const jobsFile = resolve(__dirname, '../src/modules/jobs/service.ts');
+    const remindersFile = resolve(__dirname, '../src/modules/reminders/service.ts');
+    expect(await errors("import { a } from '../events';\nexport const x = a;\n", jobsFile)).toBe(1);
+    expect(await errors("import { a } from '../../shared/db';\nexport const x = a;\n", jobsFile)).toBe(0);
+    expect(await errors("import { a } from '../events';\nexport const x = a;\n", remindersFile)).toBe(1);
+    expect(await errors("import { a } from '../jobs';\nexport const x = a;\n", remindersFile)).toBe(0);
   });
 });

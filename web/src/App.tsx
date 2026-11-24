@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BottomNav } from './components/BottomNav';
 import { EmptyState } from './components/EmptyState';
+import { ReminderCards } from './components/ReminderCards';
 import { AuthPage } from './pages/AuthPage';
 import { ChatsPage } from './pages/ChatsPage';
 import { InboxPage } from './pages/InboxPage';
@@ -41,6 +42,7 @@ export function App() {
 
   return (
     <>
+      <ReminderCards />
       <Routes>
         <Route path="/" element={<InboxPage />} />
         <Route path="/review/:id" element={<ReviewPage />} />
