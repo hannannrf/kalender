@@ -1,8 +1,10 @@
-// Detected Events waiting for the User, grouped by Source Chat (FR-05, S03-16). Review and confirm arrive in S04.
+// Detected Events waiting for the User, grouped by Source Chat (FR-05). Each card opens the review screen (FR-06).
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { EmptyState } from '../components/EmptyState';
 import { AlertIcon } from '../components/icons';
+import { dayText, timeText } from '../format';
 import pageStyles from './Page.module.css';
 import styles from './InboxPage.module.css';
 
@@ -15,14 +17,6 @@ type DetectedEvent = {
   place: string | null;
   uncertain: ('date' | 'time' | 'event')[];
 };
-
-// The server sends PKT calendar values, so format them as plain dates with no time zone shift.
-const dayFormat = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' });
-const dayText = (date: string) => dayFormat.format(new Date(`${date}T00:00:00Z`));
-function timeText(time: string) {
-  const [h, m] = time.split(':').map(Number);
-  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
-}
 
 function groupByChat(events: DetectedEvent[]) {
   const groups = new Map<string, { chat: DetectedEvent['chat']; events: DetectedEvent[] }>();
@@ -41,28 +35,30 @@ function Value({ marked, children }: { marked: boolean; children: string }) {
 function EventCard({ event }: { event: DetectedEvent }) {
   const check = event.uncertain.length > 0 || event.date === null;
   return (
-    <li className={styles.card} style={{ borderLeftColor: `var(--chat-${event.chat.colour})` }}>
-      <p className={styles.title}>
-        <Value marked={event.uncertain.includes('event')}>{event.title}</Value>
-      </p>
-      <p className={styles.when}>
-        {event.date === null ? (
-          <Value marked>Needs date</Value>
-        ) : (
-          <>
-            <Value marked={event.uncertain.includes('date')}>{dayText(event.date)}</Value>
-            {', '}
-            <Value marked={event.uncertain.includes('time')}>{event.time ? timeText(event.time) : 'All day'}</Value>
-          </>
-        )}
-      </p>
-      {event.place && <p className={styles.place}>{event.place}</p>}
-      {check && (
-        <p className={styles.chip}>
-          <AlertIcon />
-          Check this
+    <li>
+      <Link to={`/review/${event.id}`} className={styles.card} style={{ borderLeftColor: `var(--chat-${event.chat.colour})` }}>
+        <p className={styles.title}>
+          <Value marked={event.uncertain.includes('event')}>{event.title}</Value>
         </p>
-      )}
+        <p className={styles.when}>
+          {event.date === null ? (
+            <Value marked>Needs date</Value>
+          ) : (
+            <>
+              <Value marked={event.uncertain.includes('date')}>{dayText(event.date)}</Value>
+              {', '}
+              <Value marked={event.uncertain.includes('time')}>{event.time ? timeText(event.time) : 'All day'}</Value>
+            </>
+          )}
+        </p>
+        {event.place && <p className={styles.place}>{event.place}</p>}
+        {check && (
+          <p className={styles.chip}>
+            <AlertIcon />
+            Check this
+          </p>
+        )}
+      </Link>
     </li>
   );
 }
@@ -77,6 +73,11 @@ export function InboxPage() {
   return (
     <main className={pageStyles.page}>
       <h1 className={pageStyles.title}>Inbox</h1>
+      {events === undefined && (
+        <p className={pageStyles.loading} role="status">
+          Loading your Inbox…
+        </p>
+      )}
       {events === 'error' && <p className={styles.problem}>Kalender could not load your Inbox. Check your connection and open it again.</p>}
       {Array.isArray(events) && events.length === 0 && (
         <EmptyState title="Nothing to check">

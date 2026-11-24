@@ -107,7 +107,7 @@ Found and fixed during the manual check: "agle hafte presentation hai" was title
 
 ## 8. Integrate
 
-PR #4 merged into `main` with a merge commit, tagged `S03-accepted`; CI on `main` is Gate 4. Production applies migration 003 to the Neon `production` branch during the build.
+PR #4 merged into `main` with a merge commit, tagged `S03-accepted`; CI on `main` is Gate 4. Production applies migration 003 to the Neon `production` branch during the build. Checked after the merge: CI on `main` passed (1676fee); the production build log shows `migrate: applied 1 (003_events_create_detected_events.sql)`; on https://kalender-tan-eta.vercel.app `/api/health` answers `{"status":"ok","db":"ok"}` and `/api/detected-events` answers 401 when signed out.
 
 ## 9. Context updated
 

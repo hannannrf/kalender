@@ -84,3 +84,7 @@
   text-underline-offset: 3px;
   cursor: pointer;
 }
+
+.loading {
+  color: var(--muted);
+}

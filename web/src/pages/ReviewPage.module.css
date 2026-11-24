@@ -1,0 +1,219 @@
+.back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.back::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-2);
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.band {
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  color: var(--on-primary);
+}
+
+.chatName {
+  font-size: var(--text-xl);
+  overflow-wrap: anywhere;
+}
+
+.quote {
+  margin: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.quote blockquote {
+  margin: 0;
+  background: var(--card);
+  border-radius: var(--radius-card) var(--radius-card) var(--radius-card) 4px;
+  padding: var(--space-3) var(--space-4);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.quote figcaption {
+  color: var(--muted);
+  font-size: var(--text-md);
+  padding-left: var(--space-2);
+}
+
+.readAs {
+  font-size: var(--text-lg);
+}
+
+.fields {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  padding: 0 var(--space-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
+}
+
+.field + .field {
+  border-top: 1px solid var(--line);
+}
+
+.field > label {
+  font-weight: 700;
+}
+
+.field input:not([type='checkbox']) {
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  min-width: 0;
+}
+
+.field input:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 1px;
+  background: var(--card);
+}
+
+/* An Uncertain value: the yellow mark on the input, plus the check zone with icon and words (never colour alone). */
+.open input:not([type='checkbox']) {
+  background: var(--uncertain-mark);
+  color: var(--uncertain-ink);
+  border-color: var(--uncertain-ink);
+}
+
+.timeRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.timeRow input:disabled {
+  opacity: 0.5;
+}
+
+.allDay {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target);
+}
+
+.allDay input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+}
+
+.reason {
+  color: var(--muted);
+  font-size: var(--text-md);
+}
+
+.check {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  background: var(--check-bg);
+  color: var(--check-ink);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+}
+
+.checkTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 700;
+}
+
+.checkTitle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.choice {
+  min-height: var(--target);
+  border: 1px solid var(--check-ink);
+  border-radius: var(--radius-control);
+  background: var(--card);
+  color: var(--check-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.choice:focus-visible,
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.fieldError {
+  color: var(--danger);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.problem {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+  font-weight: 500;
+}
+
+.actions {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.primary,
+.secondary {
+  min-height: 48px;
+  border-radius: var(--radius-control);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary {
+  border: 0;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.primary:disabled {
+  background: var(--surface);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.secondary {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+}
