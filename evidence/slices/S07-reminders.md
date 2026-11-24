@@ -150,6 +150,16 @@ Known limits:
   - "Meeting", confirmed in S03 before Reminders existed, said so. Save gave it a Reminder ("Reminder on Fri 27 Nov, 7:50 am"), and Off then showed "No Reminder for this Event."
   - The default was set back to 30 minutes afterwards.
 
+- CI on PR #7 passed (lint, typecheck, tests on Postgres 17, build).
+- Deployed preview (https://kalender-abczsf4au-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new test account:
+  - health 200 with `db: ok`; register 201;
+  - `GET /api/settings/reminders` gives the default 30; `PUT` 10 answers 200, and `PUT` 15 answers 400 naming the four choices;
+  - "Seminar" tomorrow at 18:00 created (201). `GET /api/events/:id` shows the Reminder `scheduled` for 17:50 PKT, so the route dispatched before answering;
+  - Reminder set to 1 day: 200 with status `none`, because that time (today 18:00) had already passed (BR-08). Off: 200 with status `off`;
+  - `GET /api/notifications` 200 with an empty list;
+  - `POST /internal/tick` with no secret and with a wrong secret both answer 404. With the Preview `TICK_SECRET` it answers 200 and ran the job queue, which shows the secret is set in Preview;
+  - delete 204; signed out, `/api/notifications` answers 401.
+
 | Settings | Edit form | Reminder card | Before S07 | Off |
 |---|---|---|---|---|
 | ![Settings](S07/settings-lead-time.jpg) | ![Edit](S07/edit-reminder-field.jpg) | ![Card](S07/reminder-card.jpg) | ![Pre-S07](S07/pre-s07-event.jpg) | ![Off](S07/reminder-off.jpg) |
