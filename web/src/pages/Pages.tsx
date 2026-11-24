@@ -1,17 +1,7 @@
 // S00 placeholder screens. Each grows into its own file in the slice that fills it.
 import { useEffect, useState } from 'react';
-import { EmptyState } from '../components/EmptyState';
 import { useSession } from '../session';
 import styles from './Page.module.css';
-
-export function EventsPage() {
-  return (
-    <main className={styles.page}>
-      <h1 className={styles.title}>Events</h1>
-      <EmptyState title="No upcoming Events">Confirm a Detected Event from your Inbox and it appears here.</EmptyState>
-    </main>
-  );
-}
 
 type Health = { status: string; db: string };
 const dbText: Record<string, string> = {

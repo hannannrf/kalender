@@ -1,0 +1,13 @@
+
+> test
+> vitest run --root server
+
+
+ RUN  v5.1.1 D:/ISE PROJECT/kalender/server
+
+
+ Test Files  10 passed (10)
+      Tests  129 passed | 2 skipped (131)
+   Start at  18:39:17
+   Duration  158.76s (tests 98%, import 2%)
+

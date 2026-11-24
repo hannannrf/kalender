@@ -4,7 +4,9 @@ import { EmptyState } from './components/EmptyState';
 import { AuthPage } from './pages/AuthPage';
 import { ChatsPage } from './pages/ChatsPage';
 import { InboxPage } from './pages/InboxPage';
-import { EventsPage, SettingsPage } from './pages/Pages';
+import { EventsPage } from './pages/EventsPage';
+import { SettingsPage } from './pages/Pages';
+import { ReviewPage } from './pages/ReviewPage';
 import pageStyles from './pages/Page.module.css';
 import { useSession } from './session';
 
@@ -40,6 +42,7 @@ export function App() {
     <>
       <Routes>
         <Route path="/" element={<InboxPage />} />
+        <Route path="/review/:id" element={<ReviewPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/chats" element={<ChatsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
