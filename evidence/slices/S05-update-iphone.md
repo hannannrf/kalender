@@ -141,3 +141,15 @@ Known limits:
 | ![Date order](S05/date-order-question.jpg) | ![Wrong Chat](S05/update-wrong-chat.jpg) | ![Update](S05/update-result.jpg) | ![iPhone zip](S05/iphone-zip-approved.jpg) | ![Revoke](S05/revoke-confirm.jpg) | ![Revoked](S05/revoked.jpg) |
 
 Found and fixed during the manual check: the result of an update first appeared only at the top of the screen, out of view when the Chat was further down. It now shows in that Chat's card. After a Revoke the card disappears, so the notice at the top takes focus instead.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 24 Nov 2026 ("Accept, merge and tag"). Reason: criteria S05-1 to S05-13 pass in CI, on the deployed preview and in the manual phone-size check. Accepted with these known limits: captioned photos are ignored; no real Android export yet (O-3 stays open until Gate 5); two S07 Reminder tests time out against a slow Neon `dev`, recorded as a risk for S13.
+
+## 8. Integrate
+
+PR #8 merged into `main` with a merge commit, tagged `S05-accepted`; CI on `main` is Gate 4. No migration in this slice. `fflate` is added to `server`.
+
+## 9. Context updated
+
+`plan.md` v08 (copy in `docs/plan-history/plan-v08.md`): S05 Accepted and marked HITL, O-3 iPhone half done and Android half moved to before Gate 5. Row 10 added to `evidence/workflow-evidence-log.md`.
