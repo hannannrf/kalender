@@ -97,3 +97,15 @@ Known limits (each closed by a later slice):
 Found and fixed during the manual check: the screens were blank for several seconds while the API answered (the local API talks to Neon in Singapore), and the Confirm button gave no sign it was working. Inbox, Events and the review screen now show a loading line, and the button shows "Saving…".
 - CI on PR #5 (Postgres 17): green, including the `evaluate.py` detection step.
 - Deployed preview (https://kalender-391ezcblz-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new test account, with a 2-message synthetic export sent 30 minutes earlier: approve 201 with 2 Detected Events; confirm "Meeting" 201 (place Room 4); confirm "Project meeting" 422 `NEEDS_REVIEW` naming the time; review `{"accept":["time"]}` 200 with the mark cleared; confirm 201 at 17:00; `GET /api/events` 200 with both in time order; `GET /api/detected-events` empty; signed out 401. The build applied migration 004 to Neon `dev`.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 24 Nov 2026 ("Accept, merge and tag"). Reason: criteria S04-1 to S04-13 pass in CI, against Neon `dev`, on the deployed preview and in the manual phone-size check; the Uncertain gate holds on the server and in the screen; the known limits (outbox and Reminders in S07, Manual Events and edits in S06, Possible Duplicate in S08) are accepted.
+
+## 8. Integrate
+
+PR #5 merged into `main` with a merge commit, tagged `S04-accepted`; CI on `main` is Gate 4. Production applies migration 004 to the Neon `production` branch during the build.
+
+## 9. Context updated
+
+`plan.md` v05 (copy in `docs/plan-history/plan-v05.md`): S04 Accepted. Row 7 added to `evidence/workflow-evidence-log.md`.

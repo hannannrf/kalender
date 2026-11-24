@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v04 (23 Nov 2026) |
+| Plan version | v05 (24 Nov 2026) |
+| Changes from v04 | S04 Accepted (review, confirm, dismiss, upcoming Events list) |
 | Changes from v03 | S03 Accepted (NFR-05 gate passes 80 of 80; CI re-scores it with `evaluate.py`) |
 | Changes from v02 | S02 Accepted; O-3 now needed before `ingestion` is accepted in S05 (S02 reads Android `.txt` only), one real iPhone export received |
 | Changes from v01 | AC-02.5 moved from S01 to S02 (the Approved Chats list arrives in S02); S01 Accepted; O-1 and O-2 done |
@@ -52,7 +53,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 | S01 | Create account, sign in and out, see only own data | FR-01, BR-11 | 01.1, 01.2 | S00 | HITL | M | Tue 24 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S02 | Approve a Chat from an Android `.txt` export: preview name, choose Look-back, see messages read; bad files refused | FR-02, BR-01..03, BR-05, BR-15, NFR-01 | 02.1, 02.3, 02.5 | S01 | HITL | M | Tue 24 | Zain Amjad | Accepted | G1 G2 G3 pass |
 | S03 | Detected Events appear after upload (English and Roman Urdu rules, Uncertain marks, Needs date) plus the NFR-05 gate | FR-05, BR-12, BR-17, BR-20, BR-21, NFR-05 | 05.1..05.9, 05.12, 05.13 | S02 | HITL | M | Tue 24 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
-| S04 | Review a Detected Event: resolve Uncertain details, edit, confirm, dismiss; upcoming Events list | FR-06, FR-11, BR-05, BR-16 | 06.1..06.3, 06.5, 06.7, 06.8, 11.1, 11.2 | S03 | HITL | M | Wed 25 | Muhammad Areeb | Planned | – |
+| S04 | Review a Detected Event: resolve Uncertain details, edit, confirm, dismiss; upcoming Events list | FR-06, FR-11, BR-05, BR-16 | 06.1..06.3, 06.5, 06.7, 06.8, 11.1, 11.2 | S03 | HITL | M | Wed 25 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S05 | Update an Approved Chat, iPhone `.zip`, date-order question, Approved Chats list, Revoke | FR-03, FR-04, BR-02, BR-06, BR-15 | 02.2, 02.4, 03.1..03.3, 04.1, 04.2 | S02, S03 | AFK | M | Wed 25 | Zain Amjad | Planned | – |
 | S06 | Manual Event; edit and delete a Confirmed Event | FR-07, FR-12, BR-16 | 07.1, 07.2, 12.1*, 12.2* | S04 | AFK | M | Wed 25 | Muhammad Areeb | Planned | – |
 | S07 | Jobs, tick, in-app Reminders, Lead Time settings, timed deletions | FR-09 (in-app), FR-10, BR-05, BR-07, BR-08, BR-14, BR-19, NFR-03 | 09.1..09.5, 10.1..10.4, 05.11, 06.6 | S04, S06 | HITL | M | Thu 26 | Abdul Hannan Rauf | Planned | – |
