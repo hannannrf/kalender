@@ -106,6 +106,8 @@ Found and fixed during the manual check: the screens were blank for several seco
 
 PR #5 merged into `main` with a merge commit, tagged `S04-accepted`; CI on `main` is Gate 4. Production applies migration 004 to the Neon `production` branch during the build.
 
+Production check after the merge (recorded during S06): CI on `main` green at `d42bd3a`; the production build log shows "migrate: applied 1 (004_events_create_confirmed_events.sql)"; https://kalender-tan-eta.vercel.app/api/health answers `{"status":"ok","db":"ok"}`; `GET /api/events` signed out answers 401.
+
 ## 9. Context updated
 
 `plan.md` v05 (copy in `docs/plan-history/plan-v05.md`): S04 Accepted. Row 7 added to `evidence/workflow-evidence-log.md`.

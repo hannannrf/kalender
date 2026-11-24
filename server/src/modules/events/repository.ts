@@ -131,3 +131,29 @@ export async function listUpcoming(db: Db, userId: string, today: string, nowTim
   );
   return res.rows;
 }
+
+export async function getConfirmed(db: Db, userId: string, id: string, lock = false): Promise<ConfirmedRow | undefined> {
+  const res = await db.query<ConfirmedRow>(
+    `select ${CONFIRMED_COLUMNS} from confirmed_events where user_id = $1 and id = $2${lock ? ' for update' : ''}`,
+    [userId, id],
+  );
+  return res.rows[0];
+}
+
+export type ConfirmedChange = { title: string; date: string; time: string | null; place: string | null };
+
+export async function updateConfirmed(db: Db, userId: string, id: string, c: ConfirmedChange): Promise<void> {
+  await db.query('update confirmed_events set title = $3, date = $4, time = $5, place = $6 where user_id = $1 and id = $2', [
+    userId,
+    id,
+    c.title,
+    c.date,
+    c.time,
+    c.place,
+  ]);
+}
+
+export async function deleteConfirmed(db: Db, userId: string, id: string): Promise<boolean> {
+  const res = await db.query('delete from confirmed_events where user_id = $1 and id = $2', [userId, id]);
+  return res.rowCount === 1;
+}

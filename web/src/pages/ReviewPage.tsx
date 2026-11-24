@@ -142,7 +142,7 @@ export function ReviewPage() {
       navigate('/events');
     } catch (err) {
       if (err instanceof ApiError && err.body.fields) setErrors(err.body.fields);
-      setProblem(err instanceof ApiError && err.body.message ? err.body.message : err instanceof ApiError && err.status === 400 ? 'Fix the details marked below.' : 'Kalender could not reach the server. Try again.');
+      setProblem(err instanceof ApiError && err.body.message ? err.body.message : err instanceof ApiError && err.status === 400 ? 'Fix the details marked above.' : 'Kalender could not reach the server. Try again.');
       setBusy(false);
     }
   }

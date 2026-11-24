@@ -29,7 +29,7 @@ export function BottomNav() {
         <NavLink
           key={tab.to}
           to={tab.to}
-          end
+          end={tab.to === '/'}
           className={({ isActive }) => (isActive ? `${styles.tab} ${styles.active}` : styles.tab)}
         >
           <span className={styles.icon}>

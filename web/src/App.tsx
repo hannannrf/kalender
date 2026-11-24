@@ -5,6 +5,7 @@ import { AuthPage } from './pages/AuthPage';
 import { ChatsPage } from './pages/ChatsPage';
 import { InboxPage } from './pages/InboxPage';
 import { EventsPage } from './pages/EventsPage';
+import { EventFormPage } from './pages/EventFormPage';
 import { SettingsPage } from './pages/Pages';
 import { ReviewPage } from './pages/ReviewPage';
 import pageStyles from './pages/Page.module.css';
@@ -44,6 +45,8 @@ export function App() {
         <Route path="/" element={<InboxPage />} />
         <Route path="/review/:id" element={<ReviewPage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/events/new" element={<EventFormPage key="new" />} />
+        <Route path="/events/:id" element={<EventFormPage />} />
         <Route path="/chats" element={<ChatsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
