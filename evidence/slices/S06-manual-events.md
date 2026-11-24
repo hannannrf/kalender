@@ -87,3 +87,5 @@ Found and fixed during the manual check:
 - The form message said "Fix the details marked below" but sits under the fields; it now says "above" (also on the review screen).
 - The Events tab was not highlighted on the add and edit forms; only the Inbox tab now needs an exact path match.
 - The message about a refused save stayed after the User changed a field; it now clears on change.
+- CI on PR #6 (Postgres 17): green, including the `evaluate.py` detection step.
+- Deployed preview (https://kalender-ei86sxow2-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new test account: create "Group study" tomorrow 18:00 at Library 201 (Source Chat null); yesterday 422 `PAST` naming the date; empty title 400 naming the title; edit time to 20:00 200 with the other details unchanged; `GET /api/events` lists it; delete 204; read after delete 404; signed out 401.
