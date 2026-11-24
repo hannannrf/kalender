@@ -2,7 +2,11 @@
 export { router } from './routes';
 export {
   confirm,
+  createManual,
+  deleteConfirmed,
   dismiss,
+  editConfirmed,
+  getConfirmed,
   getDetected,
   ingestMessages,
   listDetected,

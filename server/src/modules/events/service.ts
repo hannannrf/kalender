@@ -94,20 +94,42 @@ const isDate = (v: string) => {
 };
 const isTime = (v: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(v);
 
+export type Details = { title: string; date: string; time: string | null; place: string | null };
+export type DetailsInput = { title?: unknown; date?: unknown; time?: unknown; place?: unknown };
+
+/** Checks the Event details that were sent (S04-9 limits); `required` details must be sent. Shared by review, create and edit. */
+function readDetails(input: DetailsInput, required: ('title' | 'date')[] = []): { details: Partial<Details>; invalid: Record<string, string> } {
+  const details: Partial<Details> = {};
+  const invalid: Record<string, string> = {};
+  const has = (k: keyof DetailsInput) => input[k] !== undefined || (required as string[]).includes(k);
+
+  if (has('title')) {
+    const title = typeof input.title === 'string' ? input.title.trim() : '';
+    if (title.length >= 1 && title.length <= 60) details.title = title;
+    else invalid.title = 'Enter a title of 1 to 60 characters.';
+  }
+  if (has('date')) {
+    if (typeof input.date === 'string' && isDate(input.date)) details.date = input.date;
+    else invalid.date = input.date === undefined || input.date === '' ? 'Enter a date.' : 'Enter a real date.';
+  }
+  if (has('time')) {
+    if (input.time === null || (typeof input.time === 'string' && isTime(input.time))) details.time = input.time;
+    else invalid.time = 'Enter a time from 00:00 to 23:59, or choose All day.';
+  }
+  if (has('place')) {
+    const place = typeof input.place === 'string' ? input.place.trim() || null : input.place;
+    if (place === null || (typeof place === 'string' && place.length <= 40)) details.place = place;
+    else invalid.place = 'Enter a place of up to 40 characters.';
+  }
+  return { details, invalid };
+}
+
 /**
  * Edits details and resolves Uncertain marks. A detail that is sent counts as reviewed (accepted or corrected),
  * so its mark is cleared; `accept` clears marks without a change, including the Event mark (U9).
  */
 export async function review(db: Pool, userId: string, id: string, input: ReviewInput): Promise<DetectedEventView | Invalid | undefined> {
-  const invalid: Record<string, string> = {};
-  const has = (k: keyof ReviewInput) => input[k] !== undefined;
-
-  const title = typeof input.title === 'string' ? input.title.trim() : input.title;
-  if (has('title') && (typeof title !== 'string' || title.length < 1 || title.length > 60)) invalid.title = 'Enter a title of 1 to 60 characters.';
-  if (has('date') && !(typeof input.date === 'string' && isDate(input.date))) invalid.date = 'Enter a real date.';
-  if (has('time') && !(input.time === null || (typeof input.time === 'string' && isTime(input.time)))) invalid.time = 'Enter a time from 00:00 to 23:59, or choose All day.';
-  const place = typeof input.place === 'string' ? input.place.trim() || null : input.place;
-  if (has('place') && !(place === null || (typeof place === 'string' && place.length <= 40))) invalid.place = 'Enter a place of up to 40 characters.';
+  const { details, invalid } = readDetails(input);
   const accept = input.accept ?? [];
   if (!Array.isArray(accept) || !accept.every((m) => MARKS.includes(m))) invalid.accept = 'Accept only date, time or event.';
   if (Object.keys(invalid).length) return { invalid };
@@ -116,13 +138,14 @@ export async function review(db: Pool, userId: string, id: string, input: Review
     const row = await repo.getDetected(tx, userId, id, true);
     if (!row) return undefined;
     const reviewed = new Set<string>(accept as Mark[]);
-    if (has('date')) reviewed.add('date');
-    if (has('time')) reviewed.add('time');
+    if ('date' in details) reviewed.add('date');
+    if ('time' in details) reviewed.add('time');
     const change: repo.DetectedChange = {
-      title: has('title') ? (title as string) : row.title,
-      date: has('date') ? (input.date as string) : row.date,
-      time: has('time') ? (input.time as string | null) : row.time,
-      place: has('place') ? (place as string | null) : row.place,
+      title: row.title,
+      date: row.date,
+      time: row.time,
+      place: row.place,
+      ...details,
       uncertain: row.uncertain.filter((m) => !reviewed.has(m)),
     };
     await repo.updateDetected(tx, userId, id, change);
@@ -209,4 +232,57 @@ export async function dismiss(db: Pool, userId: string, id: string): Promise<boo
 export async function listUpcoming(db: Db, userId: string, now: Date): Promise<ConfirmedEventView[]> {
   const { date, time } = pktParts(now);
   return (await repo.listUpcoming(db, userId, date, time)).map(confirmedView);
+}
+
+// ---- Manual Events, edit and delete (FR-07, FR-12, BR-16) ----
+
+export type PastRefusal = { refused: 'PAST'; message: string; fields: Record<string, string> };
+
+function pastRefusal(e: { date: string; time: string | null }, now: Date): PastRefusal | undefined {
+  const past = pastDetail(e.date, e.time, now);
+  return past && { refused: 'PAST', message: 'An Event cannot be in the past. Choose a later date or time.', fields: { [past]: `This ${past} has passed.` } };
+}
+
+/** AC-07.1, AC-07.2: a Manual Event needs a title and a date that is not past. */
+export async function createManual(db: Db, userId: string, input: DetailsInput, now: Date): Promise<ConfirmedEventView | Invalid | PastRefusal> {
+  const { details, invalid } = readDetails(input, ['title', 'date']);
+  if (Object.keys(invalid).length) return { invalid };
+  const event = { title: details.title!, date: details.date!, time: details.time ?? null, place: details.place ?? null };
+  const past = pastRefusal(event, now);
+  if (past) return past;
+  // shortcut: no EventConfirmed outbox message yet; S07 adds the outbox and Reminders.
+  return confirmedView(await repo.insertConfirmed(db, userId, { chat_id: null, chat_name: null, chat_colour: null, ...event }));
+}
+
+export async function getConfirmed(db: Db, userId: string, id: string): Promise<ConfirmedEventView | undefined> {
+  const row = await repo.getConfirmed(db, userId, id);
+  return row && confirmedView(row);
+}
+
+/** FR-12: changes only the details sent; the result must not be past (BR-16). The Source Chat never changes. */
+export async function editConfirmed(
+  db: Pool,
+  userId: string,
+  id: string,
+  input: DetailsInput,
+  now: Date,
+): Promise<ConfirmedEventView | Invalid | PastRefusal | undefined> {
+  const { details, invalid } = readDetails(input);
+  if (Object.keys(invalid).length) return { invalid };
+  return withTransaction(db, async (tx) => {
+    const row = await repo.getConfirmed(tx, userId, id, true);
+    if (!row) return undefined;
+    const next = { title: row.title, date: row.date, time: row.time, place: row.place, ...details };
+    const past = pastRefusal(next, now);
+    if (past) return past;
+    await repo.updateConfirmed(tx, userId, id, next);
+    // shortcut: no EventUpdated outbox message yet; S07 moves the Reminder, S11 the calendar copy.
+    return confirmedView({ ...row, ...next });
+  });
+}
+
+/** FR-12: false if this User has no such Event. */
+export async function deleteConfirmed(db: Db, userId: string, id: string): Promise<boolean> {
+  // shortcut: no EventDeleted outbox message yet; S07 cancels the Reminder, S11 removes the calendar copy.
+  return repo.deleteConfirmed(db, userId, id);
 }

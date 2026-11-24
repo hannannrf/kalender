@@ -56,3 +56,33 @@ router.post('/detected-events/:id/dismiss', async (req, res) => {
 router.get('/events', async (req, res) => {
   res.json(await service.listUpcoming(db(), userIdOf(req), new Date()));
 });
+
+type Answer = service.ConfirmedEventView | service.Invalid | service.PastRefusal | undefined;
+
+function answer(res: Response, result: Answer, status = 200) {
+  if (!result) notFound(res);
+  else if ('invalid' in result) res.status(400).json({ error: 'invalid', fields: result.invalid });
+  else if ('refused' in result) res.status(422).json({ error: result.refused, message: result.message, fields: result.fields });
+  else res.status(status).json(result);
+}
+
+router.post('/events', async (req, res) => {
+  answer(res, await service.createManual(db(), userIdOf(req), req.body ?? {}, new Date()), 201);
+});
+
+router.get('/events/:id', async (req, res) => {
+  const id = idOf(req, res);
+  if (id) answer(res, await service.getConfirmed(db(), userIdOf(req), id));
+});
+
+router.patch('/events/:id', async (req, res) => {
+  const id = idOf(req, res);
+  if (id) answer(res, await service.editConfirmed(db(), userIdOf(req), id, req.body ?? {}, new Date()));
+});
+
+router.delete('/events/:id', async (req, res) => {
+  const id = idOf(req, res);
+  if (!id) return;
+  if (await service.deleteConfirmed(db(), userIdOf(req), id)) res.status(204).end();
+  else notFound(res);
+});
