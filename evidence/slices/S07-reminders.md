@@ -165,3 +165,15 @@ Known limits:
 | ![Settings](S07/settings-lead-time.jpg) | ![Edit](S07/edit-reminder-field.jpg) | ![Card](S07/reminder-card.jpg) | ![Pre-S07](S07/pre-s07-event.jpg) | ![Off](S07/reminder-off.jpg) |
 
 Found and fixed during the manual check: an Event confirmed before S07 showed only "it has none". The form now tells the User to save, which creates the Reminder.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 24 Nov 2026 ("Accept, merge and tag"). Reason: criteria S07-1 to S07-16 pass in CI, against Neon `dev`, on the deployed preview and in the manual phone-size check; the known limits (push in S10, calendar copies in S11, Events from before S07) are accepted. The plan had O-5, the cron-job.org tick, as a condition for accepting S07. It is not set up yet. The slice was accepted without it, and `plan.md` v07 moves O-5 to before Gate 5.
+
+## 8. Integrate
+
+PR #7 merged into `main` with a merge commit, tagged `S07-accepted`; CI on `main` is Gate 4. The production build applies migrations 005 and 006 to the Neon `production` branch.
+
+## 9. Context updated
+
+`plan.md` v07 (copy in `docs/plan-history/plan-v07.md`): S07 Accepted, O-5 moved to before Gate 5. Row 9 added to `evidence/workflow-evidence-log.md`.
