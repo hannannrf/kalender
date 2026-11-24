@@ -36,6 +36,8 @@ const STATUS: Record<service.Refusal['refused'], number> = {
   NEEDS_DATE_ORDER: 422,
   DATE_ORDER_MISMATCH: 422,
   DUPLICATE_CHAT: 409,
+  WRONG_CHAT: 422,
+  CHAT_NOT_APPROVED: 422,
 };
 
 function refuse(res: Response, refusal: service.Refusal) {
@@ -45,6 +47,9 @@ function refuse(res: Response, refusal: service.Refusal) {
 const dateOrderOf = (value: unknown): DateOrder | undefined => (value === 'DMY' || value === 'MDY' ? value : undefined);
 
 export const router = Router();
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const notFound = (res: Response) => res.status(404).json({ error: 'not_found' });
 
 router.get('/chats', async (req, res) => {
   res.json(await service.listChats(db(), userIdOf(req)));
@@ -77,4 +82,23 @@ router.post('/chats', receiveFile, async (req, res) => {
   );
   if ('refused' in result) refuse(res, result);
   else res.status(201).json(result);
+});
+
+// FR-03: unknown, malformed or another User's id all answer 404 (BR-11).
+router.post('/chats/:id/uploads', receiveFile, async (req, res) => {
+  const id = String(req.params.id);
+  if (!UUID.test(id)) return void notFound(res);
+  const file = req.file!;
+  const result = await service.updateChat(db(), userIdOf(req), id, { bytes: file.buffer, filename: file.originalname }, new Date());
+  if (!result) notFound(res);
+  else if ('refused' in result) refuse(res, result);
+  else res.json(result);
+});
+
+// FR-04: Revoke.
+router.delete('/chats/:id', async (req, res) => {
+  const id = String(req.params.id);
+  if (!UUID.test(id)) return void notFound(res);
+  if (await service.revokeChat(db(), userIdOf(req), id, new Date())) res.status(204).end();
+  else notFound(res);
 });

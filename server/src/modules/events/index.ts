@@ -4,6 +4,7 @@ export {
   confirm,
   createManual,
   deleteConfirmed,
+  deleteUnconfirmedForChat,
   dismiss,
   editConfirmed,
   getConfirmed,

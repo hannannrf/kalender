@@ -174,6 +174,8 @@ Found and fixed during the manual check: an Event confirmed before S07 showed on
 
 PR #7 merged into `main` with a merge commit, tagged `S07-accepted`; CI on `main` is Gate 4. The production build applies migrations 005 and 006 to the Neon `production` branch.
 
+After merge: CI on `main` passed at `194ebb1`. Production deployment `kalender-busz82ypy` is aliased to https://kalender-tan-eta.vercel.app; its build log shows `migrate: applied 2 (005_jobs_create_jobs_and_outbox.sql, 006_reminders_create_reminders.sql)`. `/api/health` answers `{"status":"ok","db":"ok"}`, `/api/settings/reminders` and `/api/notifications` answer 401 when signed out, and `POST /internal/tick` without the secret answers 404.
+
 ## 9. Context updated
 
 `plan.md` v07 (copy in `docs/plan-history/plan-v07.md`): S07 Accepted, O-5 moved to before Gate 5. Row 9 added to `evidence/workflow-evidence-log.md`.

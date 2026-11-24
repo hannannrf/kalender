@@ -20,6 +20,7 @@ Approval time for all cases: Monday 19 Oct 2026 10:25:40 PKT.
 | F1 | Update SE-3D Class with `WhatsApp Chat with Ammi.txt` | `WRONG_CHAT`; pointers unchanged | AC-03.2 |
 | F2 | Approve `notes.txt` and `WhatsApp Chat with Fake.txt` | `NOT_AN_EXPORT`; no Chat created | AC-02.3 |
 | F3 | Revoke ISE Project Team, then upload its export as an update | `CHAT_NOT_APPROVED` | AC-04.2 |
+| R1 | `real/WhatsApp Chat - Binary tree.zip` (real iPhone export, names, links and roll numbers replaced), approved at Mon 23 Nov 2026 20:00 PKT | Month/day found without asking; 299 text messages; 37 read with 7 days, 11 with 1 day | R2-18 |
 
 ## Detection scoring rules
 

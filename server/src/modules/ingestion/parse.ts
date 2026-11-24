@@ -1,5 +1,6 @@
 // The only code that knows the WhatsApp export format (AGENTS.md section 4.5). Pure: no clock, I/O or logging.
 import { createHash } from 'node:crypto';
+import { unzipSync } from 'fflate';
 import { pktToUtc } from '../../shared/time';
 
 export type DateOrder = 'DMY' | 'MDY';
@@ -19,12 +20,21 @@ export type Parsed = {
 export type Rejected = { kind: 'rejected'; code: 'NOT_AN_EXPORT' | 'DATE_ORDER_MISMATCH'; reason: string };
 export type NeedsDateOrder = { kind: 'needs-date-order'; nameFromFile: string | null };
 
-// "19/10/2026, 10:25 am - Hira: noted". Android puts a narrow no-break space before am/pm (\s matches it); some phones use 24-hour time.
+// Android "19/10/2026, 10:25 am - Hira: noted"; iPhone "[10/25/26, 3:22:38 PM] Hira: noted" (seconds are dropped).
+// Both put a narrow no-break space before am/pm (\s matches it); some phones use 24-hour time.
 const HEADER = /^(\d{1,2})\/(\d{1,2})\/(\d{4}|\d{2}),? (\d{1,2}):(\d{2})(?:\s?([ap])\.?\s?m\.?)? - (.*)$/i;
+const IPHONE_HEADER = /^\[(\d{1,2})\/(\d{1,2})\/(\d{4}|\d{2}),? (\d{1,2}):(\d{2})(?::\d{2})?(?:\s?([ap])\.?\s?m\.?)?\] (.*)$/i;
 const FILE_NAME = /^WhatsApp Chat (?:with|-) (.+)$/i;
 const COPY_SUFFIX = / \(\d+\)$/; // "name (1).txt" when the phone saved the file twice
 const EDITED = /\s*<This message was edited>$/;
-const LRM = new RegExp(String.fromCharCode(0x200e), 'g'); // left-to-right mark iPhone puts before some lines
+const LRM = String.fromCharCode(0x200e); // left-to-right mark iPhone puts before notices, media and some lines
+// Invisible marks removed from message text: the left-to-right mark and the isolate marks around an @mention.
+const MARKS = new RegExp(`[${LRM}${String.fromCharCode(0x2068)}${String.fromCharCode(0x2069)}]`, 'g');
+// iPhone media line, with or without a caption or file name in front ("notes.pdf <LRM>document omitted").
+// Ignored whole, caption included (BR-03, S05 decision 2).
+const MEDIA_SUFFIX = new RegExp(`${LRM}(image|video|audio|sticker|GIF|document|Contact card) omitted$`, 'i');
+const CHAT_ENTRY = '_chat.txt';
+const MAX_CHAT_BYTES = 20 * 1024 * 1024; // zip-bomb guard: a _chat.txt that would inflate past this is refused
 const IGNORED_TEXT = [
   /^<Media omitted>$/i,
   /^(image|video|audio|sticker|GIF|document|Contact card) omitted$/i,
@@ -46,7 +56,7 @@ function names(filename: string) {
 type Header = { a: number; b: number; year: number; hour: number; minute: number; rest: string };
 
 function readHeader(line: string): Header | undefined {
-  const m = HEADER.exec(line);
+  const m = HEADER.exec(line) ?? IPHONE_HEADER.exec(line);
   if (!m) return undefined;
   const [, a, b, y, h, min, ampm, rest] = m;
   let hour = Number(h);
@@ -76,16 +86,39 @@ export function fingerprint(sentAt: Date, sender: string, text: string): string 
   return createHash('sha256').update(`${sentAt.toISOString()}\n${sender}\n${text}`).digest('hex');
 }
 
-/** BR-15: parse an Android `.txt` Chat Export. `dateOrder` is the User's answer, or the order stored at approval. */
-export function parseExport(bytes: Uint8Array, filename: string, dateOrder?: DateOrder): Parsed | Rejected | NeedsDateOrder {
-  // shortcut: iPhone .zip exports are refused until S05 adds them (plan.md).
-  if (!/\.txt$/i.test(filename)) {
-    return notAnExport('Upload the .txt file WhatsApp made with Export chat. iPhone .zip exports are not supported yet.');
+/** The `_chat.txt` inside an iPhone `.zip`. No other entry is ever inflated (BR-03, Q-13). */
+function chatFromZip(bytes: Uint8Array): Uint8Array | Rejected {
+  let tooBig = false;
+  let files: Record<string, Uint8Array>;
+  try {
+    files = unzipSync(bytes, {
+      filter: (file) => {
+        if (file.name !== CHAT_ENTRY) return false;
+        tooBig = file.originalSize > MAX_CHAT_BYTES;
+        return !tooBig;
+      },
+    });
+  } catch {
+    return notAnExport('This .zip file is damaged. Export the Chat again from WhatsApp.');
   }
-  const lines = new TextDecoder('utf-8').decode(bytes).split(/\r?\n/); // TextDecoder drops a UTF-8 BOM
+  if (tooBig) return notAnExport('The chat inside this .zip is too large to read.');
+  return files[CHAT_ENTRY] ?? notAnExport('This .zip has no WhatsApp chat in it. Use Export chat in WhatsApp and choose Without media.');
+}
+
+/** BR-15: parse an Android `.txt` or iPhone `.zip` Chat Export. `dateOrder` is the User's answer, or the order stored at approval. */
+export function parseExport(bytes: Uint8Array, filename: string, dateOrder?: DateOrder): Parsed | Rejected | NeedsDateOrder {
+  let chat = bytes;
+  if (/\.zip$/i.test(filename)) {
+    const unzipped = chatFromZip(bytes);
+    if (!(unzipped instanceof Uint8Array)) return unzipped;
+    chat = unzipped;
+  } else if (!/\.txt$/i.test(filename)) {
+    return notAnExport('Upload the .txt or .zip file WhatsApp made with Export chat.');
+  }
+  const lines = new TextDecoder('utf-8').decode(chat).split(/\r?\n/); // TextDecoder drops a UTF-8 BOM
   const headers = new Map<number, Header>();
   lines.forEach((line, i) => {
-    const h = readHeader(line.replace(LRM, ''));
+    const h = readHeader(line.startsWith(LRM) ? line.slice(1) : line);
     if (h) headers.set(i, h);
   });
   if (headers.size === 0) return notAnExport('This is not a WhatsApp Chat Export: no message lines were found in it.');
@@ -103,8 +136,11 @@ export function parseExport(bytes: Uint8Array, filename: string, dateOrder?: Dat
   let current: { sentAt: Date; sender: string; lines: string[] } | undefined; // undefined after a notice
   const finish = () => {
     if (!current) return;
-    const text = current.lines.join('\n').replace(LRM, '').replace(EDITED, '').trim();
-    if (text && !IGNORED_TEXT.some((re) => re.test(text))) {
+    const raw = current.lines.join('\n');
+    // iPhone starts notices (sent as the group, or "You") and media with a left-to-right mark (BR-03).
+    const ignored = raw.startsWith(LRM) || MEDIA_SUFFIX.test(raw);
+    const text = raw.replace(MARKS, '').replace(EDITED, '').trim();
+    if (text && !ignored && !IGNORED_TEXT.some((re) => re.test(text))) {
       messages.push({ sentAt: current.sentAt, sender: current.sender, text, fingerprint: fingerprint(current.sentAt, current.sender, text) });
     }
     current = undefined;
