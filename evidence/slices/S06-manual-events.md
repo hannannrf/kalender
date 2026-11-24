@@ -89,3 +89,15 @@ Found and fixed during the manual check:
 - The message about a refused save stayed after the User changed a field; it now clears on change.
 - CI on PR #6 (Postgres 17): green, including the `evaluate.py` detection step.
 - Deployed preview (https://kalender-ei86sxow2-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new test account: create "Group study" tomorrow 18:00 at Library 201 (Source Chat null); yesterday 422 `PAST` naming the date; empty title 400 naming the title; edit time to 20:00 200 with the other details unchanged; `GET /api/events` lists it; delete 204; read after delete 404; signed out 401.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 24 Nov 2026 ("Accept, merge and tag"). Reason: criteria S06-1 to S06-9 pass in CI, against Neon `dev`, on the deployed preview and in the manual phone-size check; the known limits (outbox messages, Reminders in S07, calendar copies in S11) are accepted.
+
+## 8. Integrate
+
+PR #6 merged into `main` with a merge commit, tagged `S06-accepted`; CI on `main` is Gate 4. No migration in this slice.
+
+## 9. Context updated
+
+`plan.md` v06 (copy in `docs/plan-history/plan-v06.md`): S06 Accepted. Row 8 added to `evidence/workflow-evidence-log.md`.
