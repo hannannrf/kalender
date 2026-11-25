@@ -356,7 +356,7 @@ describe.skipIf(!hasDb)('push delivery (S10)', () => {
     await tick(db(), J(1, 16, 31)); // 1 minute after: on time
     const meeting = sent.filter((s) => s.payload.title === 'Project meeting');
     expect(meeting.map((s) => s.endpoint).sort()).toEqual([p1.endpoint, p2.endpoint].sort());
-    expect(meeting[0].payload).toEqual({ title: 'Project meeting', body: 'Today, 5:00 pm', tag: expect.any(String), url: '/' });
+    expect(meeting[0].payload).toEqual({ title: 'Project meeting', body: 'Aaj, 5:00 pm', tag: expect.any(String), url: '/' });
     expect(sent.filter((s) => s.payload.title === 'Other').map((s) => s.endpoint)).toEqual([bPhone.endpoint]);
 
     await tick(db(), J(1, 17, 40)); // 10 minutes after: late, still pushed
@@ -418,11 +418,12 @@ describe.skipIf(!hasDb)('push delivery (S10)', () => {
     setPushSender(undefined);
   });
 
-  it('S10 notification time text in PKT: today, tomorrow, a later date and All-day', () => {
+  it('S10 notification time text in PKT uses the in-app words: Aaj, Kal, Parson, then the date; All day', () => {
     const now = J(4, 23, 59);
-    expect(whenText(JD(4), '09:05', now)).toBe('Today, 9:05 am');
-    expect(whenText(JD(5), '12:00', now)).toBe('Tomorrow, 12:00 pm');
-    expect(whenText(JD(5), '00:30', now)).toBe('Tomorrow, 12:30 am');
-    expect(whenText(JD(10), null, now)).toBe('Fri 10 Jul, all day');
+    expect(whenText(JD(4), '09:05', now)).toBe('Aaj, 9:05 am');
+    expect(whenText(JD(5), '12:00', now)).toBe('Kal, 12:00 pm');
+    expect(whenText(JD(5), '00:30', now)).toBe('Kal, 12:30 am');
+    expect(whenText(JD(6), null, now)).toBe('Parson, All day');
+    expect(whenText(JD(10), null, now)).toBe('Fri 10 Jul, All day');
   });
 });

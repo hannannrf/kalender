@@ -109,18 +109,12 @@ const sender = (): PushSender | undefined => testSender ?? (vapid() ? webPushSen
 
 export const pushPublicKey = (): string | undefined => vapid()?.publicKey;
 
-/** "Today, 5:00 pm", "Tomorrow, all day" or "Fri 27 Nov, 5:00 pm", in PKT. */
+/** The same words as the in-app Reminder card (ui-direction.md): "Aaj, 5:00 pm", "Kal, All day", "Parson, ..." or "Fri 27 Nov, 5:00 pm", in PKT. */
 export function whenText(date: string, time: string | null, now: Date): string {
-  const today = pktParts(now).date;
-  const tomorrow = pktParts(new Date(now.getTime() + 24 * 60 * MINUTE)).date;
+  const near = ['Aaj', 'Kal', 'Parson'][[0, 1, 2].findIndex((n) => pktParts(new Date(now.getTime() + n * 24 * 60 * MINUTE)).date === date)];
   const [y, m, d] = date.split('-').map(Number);
-  const day =
-    date === today
-      ? 'Today'
-      : date === tomorrow
-        ? 'Tomorrow'
-        : new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).replace(',', '');
-  if (!time) return `${day}, all day`;
+  const day = near ?? new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).replace(',', '');
+  if (!time) return `${day}, All day`;
   const [h, min] = time.split(':').map(Number);
   return `${day}, ${h % 12 || 12}:${String(min).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
 }

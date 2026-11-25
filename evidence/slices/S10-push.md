@@ -84,7 +84,7 @@ What the agent built:
 - **`reminders` service:**
   - `deliverDue` collects the on-time and late Reminders while it writes the in-app rows, commits, and only then calls `pushAll`. A missed Reminder is not pushed (Q-23). Any error in `pushAll` is logged by name only and never reaches the in-app part;
   - `pushAll` sends one push per subscription of each User, all at once, through `web-push` with the VAPID keys from the environment, a 5-second timeout, `TTL` 600 seconds (after 10 minutes the Reminder counts as missed anyway) and high urgency. A 404 or 410 deletes that subscription; any other failure is logged as `{ where: 'reminders.push', status }` only;
-  - the payload is `{ title, body, tag, url }`: the Event title, a PKT time text such as "Today, 5:00 pm", "Tomorrow, all day" or "Fri 27 Nov, 5:00 pm" (`whenText`), the Event id as the tag (a repeat replaces the old notification) and `/`;
+  - the payload is `{ title, body, tag, url }`: the Event title, a PKT time text in the in-app words, such as "Aaj, 5:00 pm", "Kal, All day" or "Fri 27 Nov, 5:00 pm" (`whenText`), the Event id as the tag (a repeat replaces the old notification) and `/`;
   - with no VAPID keys, push is off and nothing else changes;
   - `registerPushSubscription` checks the browser's `PushSubscription.toJSON()` shape: an `https` endpoint of at most 1000 characters and two keys of at most 200 characters each;
   - `setPushSender` replaces the push service in tests. It is not exported from the module's `index.ts`.
@@ -108,7 +108,7 @@ Design choices for the human to review:
 Known limits:
 - The tick runs every minute only once cron-job.org calls it (O-5). Until then, Reminders, in the app and by push, go out only when the tick is called.
 - iPhones get push only when Kalender is added to the Home Screen (iOS 16.4 or later). Settings says this.
-- The browser pane used for the local check blocks notifications, so only the "blocked" state could be shown there. The "off" and "on" states and a real push need the phone check (S10-11).
+- The browser pane used for the local check blocks notifications, so only the "blocked" state was shown there. The "on" state and a real push were checked on the phone (S10-11).
 
 ## 6. Checks
 
@@ -134,4 +134,16 @@ Found and fixed on the deployed preview:
   - a second subscription, then `DELETE /api/account`: 204, and a query on Neon `dev` finds no subscription row left from this check (AC-13.3);
   - signed out, `/api/push/public-key` answers 401.
 - Preview tick with the Preview `TICK_SECRET`: the first calls worked through a backlog left by earlier test runs on Neon `dev` (128 Reminders and 185 Detected Event expiry jobs). Each job took about 2 seconds from the Vercel function to Neon `dev`, so those ticks took 95 to 105 seconds. Once the backlog was gone, a tick took 6 seconds. This matters for NFR-03: the tick runs jobs before Reminders, so a large job backlog makes Reminders late. It is a risk for S13, together with the open Vercel region decision.
-- **S10-11, the real-phone check, is not done yet.** The preview tick was called every minute from 15:51 to 16:05 PKT, and every call answered 200. In that time no push subscription from a real phone and no Reminder for a phone test reached Neon `dev`, so no push was sent to a phone. The push path itself is covered by S10-4 to S10-6 with a fake push service. The real push is still unchecked: the browser push service accepting the VAPID-signed message, and the phone showing it.
+- **S10-11, real phone (Android, Chrome), on the S10 preview.** Abdul Hannan Rauf created a throwaway account on the phone, turned phone notifications on, chose a 10-minute Lead Time and added "Android test" for today at 9:22 pm. The agent called the preview tick every minute.
+  - The tick at 21:12:59 PKT delivered 1 Reminder. Its Reminder Time was 21:12, so it was on time (AC-09.1).
+  - The phone showed the notification at 9:12 pm with the Kalender icon, the title and "Today, 9:22 pm" (decision 3(a)). Tapping it opened Kalender on the Inbox, where the in-app Reminder card was also shown (C-05).
+  - The throwaway account was deleted on the phone afterwards. No push subscription from a real phone is left on Neon `dev`.
+  - An earlier attempt, 20:51 to 21:05 PKT, ticked every minute, but the phone was not set up yet, so nothing was sent.
+  - The agent's tick log printed UTC times labelled PKT, because Git Bash on Windows ignored `TZ=Asia/Karachi`. The PKT times here were converted from it and match the phone's clock.
+
+| Lock screen | Tapped |
+|---|---|
+| ![Push](S10/phone-push-lock-screen.jpg) | ![Opened](S10/phone-opened-from-push.jpg) |
+
+Found and fixed after the phone check:
+- The push said "Today, 9:22 pm", but the in-app card for the same Reminder said "Aaj, 9:22 pm". The push now uses the in-app words: "Aaj", "Kal" and "Parson", then the weekday and date, and "All day" (ui-direction.md). The S10 tests check this.
