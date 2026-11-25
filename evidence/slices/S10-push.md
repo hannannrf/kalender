@@ -147,3 +147,15 @@ Found and fixed on the deployed preview:
 
 Found and fixed after the phone check:
 - The push said "Today, 9:22 pm", but the in-app card for the same Reminder said "Aaj, 9:22 pm". The push now uses the in-app words: "Aaj", "Kal" and "Parson", then the weekday and date, and "All day" (ui-direction.md). The S10 tests check this.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 25 Nov 2026 ("Accept, merge and tag"). Reason: criteria S10-1 to S10-11 pass in CI, on the deployed preview, in the local browser check and on a real Android phone. Accepted with these known limits: iPhones need Kalender on the Home Screen before push works, and that was not checked on an iPhone; a push lost between the commit and the send is not retried (the in-app Reminder stays); a large job backlog makes the tick slow from Vercel to Neon `dev`, which is a NFR-03 risk for S13; the Android share target is left out.
+
+## 8. Integrate
+
+PR #11 merged into `main` with a merge commit, tagged `S10-accepted`; CI on `main` is Gate 4. Migration 007 runs on the production database at the production build. New dependency: `web-push` 3.6.7 (server). New Vercel variables: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT` in Preview and Production.
+
+## 9. Context updated
+
+`plan.md` v11 (copy in `docs/plan-history/plan-v11.md`): S10 Accepted, the tick-backlog risk added for S13. Architecture section 8 has the push subscription retention row. Row 13 added to `evidence/workflow-evidence-log.md`.

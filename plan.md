@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v10 (25 Nov 2026) |
+| Plan version | v11 (25 Nov 2026) |
+| Changes from v10 | S10 Accepted (web push through a hand-written service worker, installable PWA; checked on a real Android phone). Risk for S13: a large job backlog makes the tick slow from Vercel to Neon `dev`, and jobs run before Reminders. The Android share target is left out (S10 decision 8) |
 | Changes from v09 | S09 Accepted (delete the account and everything it owns; AFK build after one Gate 1 product question: the User types their password again). S11 must add `calendar-sync.deleteAllForUser` to account deletion and closes the Google token part of AC-13.3 |
 | Changes from v08 | S08 Accepted (Possible Duplicate with add, update or dismiss). It ran as HITL, not AFK, because Gate 1 needed a BR-13 reading (D-28: a missing place keeps the existing place). The calendar part of AC-06.4 stays with S11 |
 | Changes from v07 | S05 Accepted (Chat update, iPhone `.zip`, date-order question, Revoke; HITL, not AFK); O-3 iPhone half done with a scrubbed real export, Android half still open |
@@ -64,7 +65,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 | S07 | Jobs, tick, in-app Reminders, Lead Time settings, timed deletions | FR-09 (in-app), FR-10, BR-05, BR-07, BR-08, BR-14, BR-19, NFR-03 | 09.1..09.5, 10.1..10.4, 05.11, 06.6 | S04, S06 | HITL | M | Thu 26 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
 | S08 | Possible Duplicate: add new, update existing, or dismiss | BR-04, BR-13 | 05.10, 06.4* | S04 | HITL | M | Thu 26 | Zain Amjad | Accepted | G1 G2 G3 pass |
 | S09 | Delete account and everything it owns | FR-13, MF-07 | 13.1, 13.3* | S07 | AFK | M | Thu 26 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
-| S10 | Push notifications through the service worker; installable PWA | FR-09 (push), C-05 | 09.3 | S07 | HITL | S | Thu 26 | Muhammad Areeb | Planned | – |
+| S10 | Push notifications through the service worker; installable PWA | FR-09 (push), C-05 | 09.3 | S07 | HITL | S | Thu 26 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S11 | Connect Google Calendar: one-way copies, retries, "Calendar update failed", unlink | FR-08, FR-13 (unlink), BR-09, BR-10, BR-18 | 08.1..08.3, 12.1, 12.2, 13.2, 13.3, 06.4 | S07 | HITL | S | Thu 26 | Zain Amjad | Planned | – |
 | S12 | Upload nudge for stale Approved Chats (OQ-05, D-27) | new FR-14 | new AC-14.x | S07 | AFK | C | Thu 26 | Muhammad Areeb | Planned | – |
 | S13 | Polish, Gate 5 end-to-end run, NFR-02/03/04 evidence | NFR-02..04 | all | all | HITL | M | Thu 26 | Abdul Hannan Rauf | Planned | – |
