@@ -92,3 +92,8 @@ export async function insertApproved(db: Db, userId: string, chat: NewChat): Pro
   );
   return res.rows[0];
 }
+
+/** AC-13.3: every Approved Chat of the User, Revoked ones included (R2-15). */
+export async function deleteAllForUser(db: Db, userId: string): Promise<void> {
+  await db.query('delete from approved_chats where user_id = $1', [userId]);
+}

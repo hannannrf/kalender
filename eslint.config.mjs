@@ -50,8 +50,19 @@ export default tseslint.config(
     },
   },
   {
+    // identity may use only the deleteAllForUser of these modules, plus jobs (AGENTS.md section 4).
     files: ['server/src/modules/identity/**/*.ts'],
-    rules: { 'no-restricted-imports': ['error', { patterns: [noDeepModuleImports] }] },
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            noDeepModuleImports,
+            { regex: String.raw`^\.\./(?!\.\.|(chats|events|reminders|calendar-sync|jobs)(/index)?$)`, message: 'identity may use only chats, events, reminders, calendar-sync and jobs (AGENTS.md section 4).' },
+          ],
+        },
+      ],
+    },
   },
   {
     files: ['web/**/*.{ts,tsx}'],

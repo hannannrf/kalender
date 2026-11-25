@@ -191,3 +191,10 @@ export async function deleteConfirmed(db: Db, userId: string, id: string): Promi
   const res = await db.query('delete from confirmed_events where user_id = $1 and id = $2', [userId, id]);
   return res.rowCount === 1;
 }
+
+/** AC-13.3: every Detected, Confirmed and Manual Event of the User, and every Source Message. */
+export async function deleteAllForUser(db: Db, userId: string): Promise<void> {
+  await db.query('delete from detected_events where user_id = $1', [userId]);
+  await db.query('delete from source_messages where user_id = $1', [userId]);
+  await db.query('delete from confirmed_events where user_id = $1', [userId]);
+}

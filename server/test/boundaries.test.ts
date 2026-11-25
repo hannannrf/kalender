@@ -36,4 +36,11 @@ describe('module boundary lint rule', () => {
     expect(await errors("import { a } from '../events';\nexport const x = a;\n", remindersFile)).toBe(1);
     expect(await errors("import { a } from '../jobs';\nexport const x = a;\n", remindersFile)).toBe(0);
   });
+
+  it('S09: identity may import only chats, events, reminders, calendar-sync and jobs', async () => {
+    const identityFile = resolve(__dirname, '../src/modules/identity/service.ts');
+    expect(await errors("import { a } from '../chats';\nimport { b } from '../events';\nimport { c } from '../reminders';\nimport { d } from '../jobs';\nexport const x = [a, b, c, d];\n", identityFile)).toBe(0);
+    expect(await errors("import { a } from '../detection';\nexport const x = a;\n", identityFile)).toBe(1);
+    expect(await errors("import { a } from '../chats/repository';\nexport const x = a;\n", identityFile)).toBeGreaterThan(0);
+  });
 });

@@ -73,3 +73,9 @@ export async function purgeFinishedSystem(db: Db, before: Date): Promise<number>
   const outbox = await db.query('delete from outbox where dispatched_at < $1', [before]);
   return (jobs.rowCount ?? 0) + (outbox.rowCount ?? 0);
 }
+
+/** AC-13.3: the User's jobs and outbox rows in every state (deliveries go with their outbox row). */
+export async function deleteAllForUser(db: Db, userId: string): Promise<void> {
+  await db.query('delete from jobs where user_id = $1', [userId]);
+  await db.query('delete from outbox where user_id = $1', [userId]);
+}

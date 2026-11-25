@@ -131,6 +131,8 @@ Found and fixed during the manual check:
 
 PR #9 merged into `main` with a merge commit, tagged `S08-accepted`; CI on `main` is Gate 4. No migration and no new dependency in this slice.
 
+After merge: CI on `main` passed at `86b7129`, and the Vercel deployment of that commit succeeded and is aliased to https://kalender-tan-eta.vercel.app. `/api/health` answers `{"status":"ok","db":"ok"}`. `GET /api/detected-events` and `POST /api/detected-events/<id>/duplicate` answer 401 when signed out.
+
 ## 9. Context updated
 
 `plan.md` v09 (copy in `docs/plan-history/plan-v09.md`): S08 Accepted and marked HITL. D-28 added to `docs/decisions.md`. Row 11 added to `evidence/workflow-evidence-log.md`.

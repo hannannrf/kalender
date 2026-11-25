@@ -20,3 +20,5 @@ export {
   type DetectedEventView,
   type IncomingMessage,
 } from './service';
+// AC-13.3: called only by identity's account deletion, in its own transaction (architecture 6.3).
+export { deleteAllForUser } from './repository';
