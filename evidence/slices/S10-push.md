@@ -123,3 +123,6 @@ Known limits:
 | Settings, blocked |
 |---|
 | ![Blocked](S10/settings-blocked.jpg) |
+
+Found and fixed on the deployed preview:
+- Every `/api` route on the first preview answered 500. The function log showed `ERR_REQUIRE_ESM`: `web-push` 4.0.0 is published as an ES module only, and the Vercel function loads the server as CommonJS. Locally and in CI the tests passed, because Node 24 and Vitest can load it. The dependency is now pinned to `web-push` 3.6.7, the CommonJS version with the same API, which matches `@types/web-push` 3.6. The S10 tests, lint and typecheck pass again.
