@@ -122,3 +122,12 @@ Known limits:
 | Settings | Wrong password | After deletion | Sign-in refused |
 |---|---|---|---|
 | ![Settings](S09/settings-delete-section.jpg) | ![Wrong](S09/delete-wrong-password.jpg) | ![Deleted](S09/deleted-notice.jpg) | ![Refused](S09/deleted-sign-in-refused.jpg) |
+
+- CI on PR #10 (Postgres 17): green, **193 passed, 2 skipped**, including all 6 tests in `server/test/account.test.ts`.
+- Deployed preview (https://kalender-nsvgp4wj7-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new throwaway account `s09-preview-<random>@test.kalender.app`:
+  - set the Lead Time to 60 minutes and added a Manual Event, "Preview study group", on 28 Nov;
+  - `DELETE /api/account` with a wrong password answered 403 `wrong_password` with the field message, and `/api/me` still answered 200;
+  - with the right password it answered 204 and cleared the `kalender_session` cookie. Afterwards `/api/me` and `/api/events` answered 401, and signing in with the same email and password answered 401 (AC-13.1);
+  - registering the same email again answered 201. The new account has no Events and the default Lead Time of 30 minutes (MF-07);
+  - that second account was deleted the same way (204), and signing in afterwards answered 401.
+  - The first attempt at this check sent every call after registering without the session cookie (the cookie file path was wrong), so all of them answered 401 and nothing was deleted. The check was then run again on the same account with the cookie file fixed, as listed above.
