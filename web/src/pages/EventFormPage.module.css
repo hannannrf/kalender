@@ -73,3 +73,22 @@
   outline-offset: 1px;
   background: var(--card);
 }
+
+/* GL-22, BR-10 (S11): the copy in Google Calendar failed after the automatic retries; Try again is the manual retry. */
+.calendarFailed,
+.calendarDone {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+}
+
+.calendarFailed {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.calendarDone {
+  background: var(--surface);
+}

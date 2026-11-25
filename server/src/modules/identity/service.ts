@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { createHash, randomBytes } from 'node:crypto';
 import type { Pool } from 'pg';
+import * as calendarSync from '../calendar-sync';
 import * as chats from '../chats';
 import * as events from '../events';
 import * as jobs from '../jobs';
@@ -67,6 +68,7 @@ const STEPS: ((tx: Db, userId: string) => Promise<void>)[] = [
   chats.deleteAllForUser,
   events.deleteAllForUser,
   reminders.deleteAllForUser,
+  calendarSync.deleteAllForUser, // revokes the Google grant best-effort first (architecture 6.3)
   repo.deleteUser,
 ];
 

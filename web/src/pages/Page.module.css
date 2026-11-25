@@ -224,3 +224,23 @@
   opacity: 0.7;
   cursor: progress;
 }
+
+/* Unlink Google Calendar (S11): two steps, like Revoke. */
+.unlink {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--danger-bg);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.unlink .danger {
+  padding: 0 var(--space-4);
+}

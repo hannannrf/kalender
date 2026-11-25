@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from 'express';
+import * as calendarSync from '../calendar-sync';
 import * as jobs from '../jobs';
 import * as reminders from '../reminders';
 import { db } from '../../shared/db';
@@ -95,10 +96,14 @@ router.post('/detected-events/:id/duplicate', async (req, res) => {
 });
 
 router.get('/events', async (req, res) => {
-  res.json(await service.listUpcoming(db(), userIdOf(req), new Date()));
+  const userId = userIdOf(req);
+  const events = await service.listUpcoming(db(), userId, new Date());
+  // Read-model exception (architecture 6.1): the "Calendar update failed" mark (GL-22).
+  const failed = await calendarSync.getStatuses(db(), userId, events.map((e) => e.id));
+  res.json(events.map((e) => ({ ...e, calendarFailed: e.id in failed })));
 });
 
-type Answer = (service.ConfirmedEventView & { reminder?: reminders.ReminderState | null }) | service.Invalid | service.PastRefusal | undefined;
+type Answer = (service.ConfirmedEventView & { reminder?: reminders.ReminderState | null; calendarFailed?: boolean }) | service.Invalid | service.PastRefusal | undefined;
 
 /** Answers a create, read or edit; a successful change is dispatched first. */
 async function answer(res: Response, result: Answer, status = 200, changed = true) {
@@ -122,7 +127,8 @@ router.get('/events/:id', async (req, res) => {
   const event = await service.getConfirmed(db(), userId, id);
   // Read-model exception (architecture 6.1): the Reminder state shown on the edit form.
   const reminder = event && ((await reminders.getReminderStates(db(), userId, [id]))[id] ?? null);
-  await answer(res, event && { ...event, reminder }, 200, false);
+  const calendarFailed = Boolean(event && (await calendarSync.getStatuses(db(), userId, [id]))[id]);
+  await answer(res, event && { ...event, reminder, calendarFailed }, 200, false);
 });
 
 router.patch('/events/:id', async (req, res) => {

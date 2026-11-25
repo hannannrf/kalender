@@ -1,5 +1,6 @@
 // S00 placeholder screens. Each grows into its own file in the slice that fills it.
 import { useEffect, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { LEAD_MINUTES, leadText } from '../format';
 import { pushState, turnOff, turnOn, type PushState } from '../push';
@@ -124,6 +125,115 @@ function PhoneNotifications() {
   );
 }
 
+/** FR-08, FR-13, MF-06 (S11): connect Google Calendar, see whether it still works, and unlink it. */
+type CalendarStatus = 'not_configured' | 'not_linked' | 'linked' | 'needs_reconnect';
+
+const calendarLabel: Record<CalendarStatus, string> = {
+  not_configured: 'Not available yet',
+  not_linked: 'Not connected',
+  linked: 'Connected',
+  needs_reconnect: 'Needs connecting again',
+};
+
+const calendarText: Record<CalendarStatus, string> = {
+  not_configured: 'Google Calendar is not set up on this server yet. Your Events and Reminders still work in Kalender.',
+  not_linked: 'Copy each Event you confirm to your Google Calendar. Edits and deletes in Kalender update the copy. Changes made in Google Calendar are not brought back.',
+  linked: 'Each Event you confirm is copied to your primary Google Calendar. Edits and deletes in Kalender update the copy.',
+  needs_reconnect: 'Google access ended. Connect again to keep your calendar up to date.',
+};
+
+/** The outcome Google's consent screen sends back to /settings?calendar=... */
+const linkResult: Record<string, string> = {
+  linked: 'Google Calendar is connected. Your upcoming Events are being copied to it.',
+  denied: 'Google Calendar is not connected, because access was not allowed.',
+  failed: 'Kalender could not connect Google Calendar. Try again.',
+};
+
+function GoogleCalendar() {
+  const [params, setParams] = useSearchParams();
+  const [status, setStatus] = useState<CalendarStatus | 'error' | undefined>();
+  const [notice, setNotice] = useState(() => linkResult[params.get('calendar') ?? '']);
+  const [problem, setProblem] = useState<string>();
+  const [busy, setBusy] = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
+
+  useEffect(() => {
+    if (params.has('calendar')) setParams({}, { replace: true }); // the outcome shows once, not again on reload
+    api<{ status: CalendarStatus }>('/calendar').then((r) => setStatus(r.status), () => setStatus('error'));
+  }, []); // once on open
+
+  async function connect() {
+    setBusy(true);
+    setProblem(undefined);
+    try {
+      window.location.assign((await api<{ url: string }>('/calendar/link', { method: 'POST' })).url);
+    } catch {
+      setProblem('Kalender could not reach the server. Try again.');
+      setBusy(false);
+    }
+  }
+
+  async function unlink() {
+    setBusy(true);
+    setProblem(undefined);
+    try {
+      await api('/calendar', { method: 'DELETE' });
+      setStatus('not_linked');
+      setUnlinking(false);
+      setNotice('Google Calendar is unlinked. Copies already in it stay there.');
+    } catch {
+      setProblem('Kalender could not unlink Google Calendar. Try again.');
+    }
+    setBusy(false);
+  }
+
+  const known = status !== undefined && status !== 'error';
+  const canConnect = status === 'not_linked' || status === 'needs_reconnect';
+  const canUnlink = status === 'linked' || status === 'needs_reconnect';
+
+  return (
+    <section className={styles.rows} aria-labelledby="calendar-heading">
+      <h2 id="calendar-heading" className={styles.sectionTitle}>
+        Google Calendar
+      </h2>
+      <div className={`${styles.row} ${styles.stacked}`}>
+        <span className={styles.value}>{status === undefined ? 'Checking…' : status === 'error' ? 'Could not check' : calendarLabel[status]}</span>
+        <p className={styles.note} role="status">
+          {notice ?? (known ? calendarText[status] : status === 'error' ? 'Kalender could not reach the server.' : '')}
+        </p>
+        {problem && (
+          <p className={styles.fieldError} role="alert">
+            {problem}
+          </p>
+        )}
+        {canConnect && !unlinking && (
+          <button type="button" className={styles.secondary} disabled={busy} onClick={connect}>
+            {busy ? 'Opening Google…' : status === 'needs_reconnect' ? 'Connect again' : 'Connect Google Calendar'}
+          </button>
+        )}
+        {canUnlink && !unlinking && (
+          <button type="button" className={styles.textButton} disabled={busy} onClick={() => setUnlinking(true)}>
+            Unlink Google Calendar
+          </button>
+        )}
+        {unlinking && (
+          <div className={styles.unlink} role="group" aria-labelledby="unlink-question">
+            <p id="unlink-question">Unlink Google Calendar? Kalender stops adding and updating Events there. Copies already in it stay.</p>
+            <div className={styles.buttons}>
+              <button type="button" className={styles.danger} disabled={busy} onClick={unlink}>
+                {busy ? 'Unlinking…' : 'Unlink'}
+              </button>
+              <button type="button" className={styles.secondary} disabled={busy} onClick={() => setUnlinking(false)}>
+                Keep connected
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 /** FR-13, MF-07: deletes the account and everything it owns once the password is typed again. */
 function DeleteAccount() {
   const session = useSession();
@@ -215,6 +325,7 @@ export function SettingsPage() {
       </section>
       <DefaultLeadTime />
       <PhoneNotifications />
+      <GoogleCalendar />
       <DeleteAccount />
       <section className={styles.rows} aria-label="System status" aria-live="polite">
         <div className={styles.row}>

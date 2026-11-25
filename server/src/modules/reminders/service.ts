@@ -51,7 +51,7 @@ async function onUpdated(tx: Db, e: EventSnapshot): Promise<void> {
 export async function onMessage(tx: Db, message: OutboxMessage): Promise<void> {
   if (message.type === 'EventConfirmed') await onConfirmed(tx, message.payload);
   else if (message.type === 'EventUpdated') await onUpdated(tx, message.payload);
-  else await repo.deleteReminder(tx, message.payload.userId, message.payload.eventId); // AC-09.2
+  else if (message.type === 'EventDeleted') await repo.deleteReminder(tx, message.payload.userId, message.payload.eventId); // AC-09.2
 }
 
 // ---- Delivery (tick task) ----

@@ -14,6 +14,7 @@ type ConfirmedEvent = {
   date: string;
   time: string | null;
   place: string | null;
+  calendarFailed?: boolean; // GL-22, S11
 };
 
 function byDay(events: ConfirmedEvent[]) {
@@ -59,6 +60,7 @@ export function EventsPage() {
                     <p className={styles.title}>{e.title}</p>
                     <p className={styles.when}>{e.time ? timeText(e.time) : 'All day'}</p>
                     <p className={styles.place}>{[e.place, e.chat.name ?? 'Manual'].filter(Boolean).join(', ')}</p>
+                    {e.calendarFailed && <p className={styles.calendarFailed}>Calendar update failed</p>}
                   </Link>
                 </li>
               ))}
