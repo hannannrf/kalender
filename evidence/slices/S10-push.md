@@ -126,3 +126,11 @@ Known limits:
 
 Found and fixed on the deployed preview:
 - Every `/api` route on the first preview answered 500. The function log showed `ERR_REQUIRE_ESM`: `web-push` 4.0.0 is published as an ES module only, and the Vercel function loads the server as CommonJS. Locally and in CI the tests passed, because Node 24 and Vitest can load it. The dependency is now pinned to `web-push` 3.6.7, the CommonJS version with the same API, which matches `@types/web-push` 3.6. The S10 tests, lint and typecheck pass again.
+- CI on PR #11 (Postgres 17): green, **200 passed, 2 skipped**, including all S10 tests.
+- Deployed preview (https://kalender-pkiq6s9r2-hannan-f17c.vercel.app, Neon `dev`), driven with `vercel curl` and a new throwaway account `s10-preview-<random>@test.kalender.app`:
+  - `/manifest.webmanifest` answers 200 as `application/manifest+json`, `/sw.js` as `application/javascript`, and `/icons/icon-512.png` as `image/png`;
+  - `GET /api/push/public-key` answers 200 with the key, so the VAPID keys are set in Preview;
+  - an `http` endpoint answers 400 with the field message; a valid subscription answers 201 with an id; deleting it answers 204, and again 404;
+  - a second subscription, then `DELETE /api/account`: 204, and a query on Neon `dev` finds no subscription row left from this check (AC-13.3);
+  - signed out, `/api/push/public-key` answers 401.
+- Preview tick with the Preview `TICK_SECRET`: the first calls worked through a backlog left by earlier test runs on Neon `dev` (128 Reminders and 185 Detected Event expiry jobs). Each job took about 2 seconds from the Vercel function to Neon `dev`, so those ticks took 95 to 105 seconds. Once the backlog was gone, a tick took 6 seconds. This matters for NFR-03: the tick runs jobs before Reminders, so a large job backlog makes Reminders late. It is a risk for S13, together with the open Vercel region decision.
