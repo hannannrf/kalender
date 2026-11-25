@@ -140,6 +140,8 @@ Known limits:
 
 PR #10 merged into `main` with a merge commit, tagged `S09-accepted`; CI on `main` is Gate 4. No migration and no new dependency in this slice.
 
+After merge: CI on `main` passed at `0e2f736`, and the Vercel deployment of that commit succeeded and is aliased to https://kalender-tan-eta.vercel.app. `/api/health` answers `{"status":"ok","db":"ok"}`. `DELETE /api/account` answers 401 when signed out.
+
 ## 9. Context updated
 
 `plan.md` v10 (copy in `docs/plan-history/plan-v10.md`): S09 Accepted, AC-13.3 marked partial for S09 and added to S11. Row 12 added to `evidence/workflow-evidence-log.md`.

@@ -2,6 +2,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../api';
 import { LEAD_MINUTES, leadText } from '../format';
+import { pushState, turnOff, turnOn, type PushState } from '../push';
 import { useSession } from '../session';
 import styles from './Page.module.css';
 
@@ -55,6 +56,70 @@ function DefaultLeadTime() {
           </p>
         </fieldset>
       )}
+    </section>
+  );
+}
+
+/** FR-09, C-05 (S10): phone notifications for this phone. Reminders always show inside Kalender too. */
+const pushText: Record<PushState, string> = {
+  unavailable: 'This browser cannot show phone notifications. Your Reminders still show here in Kalender.',
+  'add-to-home-screen': 'On iPhone, add Kalender to your Home Screen first: tap Share, then Add to Home Screen, and open it from there. Your Reminders still show here in Kalender.',
+  'not-set-up': 'Phone notifications are not set up on this server yet. Your Reminders still show here in Kalender.',
+  blocked: 'Notifications for Kalender are blocked on this phone. Allow them in your browser or phone settings, then come back. Your Reminders still show here in Kalender.',
+  off: 'Get each Reminder on this phone, even when Kalender is closed. Your Reminders also show here in Kalender.',
+  on: 'This phone gets each Reminder as a notification. Your Reminders also show here in Kalender.',
+};
+
+const pushLabel: Record<PushState, string> = {
+  unavailable: 'Not available here',
+  'add-to-home-screen': 'Add to Home Screen first',
+  'not-set-up': 'Not available yet',
+  blocked: 'Blocked on this phone',
+  off: 'Off for this phone',
+  on: 'On for this phone',
+};
+
+function PhoneNotifications() {
+  const [state, setState] = useState<PushState | 'error' | undefined>();
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    pushState().then(setState, () => setState('error'));
+  }, []);
+
+  async function change(action: () => Promise<PushState>) {
+    setBusy(true);
+    try {
+      setState(await action());
+    } catch {
+      setState('error');
+    }
+    setBusy(false);
+  }
+
+  const button =
+    state === 'off' ? (
+      <button type="button" className={styles.secondary} disabled={busy} onClick={() => change(turnOn)}>
+        {busy ? 'Turning on…' : 'Turn on phone notifications'}
+      </button>
+    ) : state === 'on' ? (
+      <button type="button" className={styles.secondary} disabled={busy} onClick={() => change(turnOff)}>
+        {busy ? 'Turning off…' : 'Turn off'}
+      </button>
+    ) : null;
+
+  return (
+    <section className={styles.rows} aria-labelledby="push-heading">
+      <h2 id="push-heading" className={styles.sectionTitle}>
+        Phone notifications
+      </h2>
+      <div className={`${styles.row} ${styles.stacked}`}>
+        <span className={styles.value}>{state === undefined ? 'Checking…' : state === 'error' ? 'Could not check' : pushLabel[state]}</span>
+        <p className={styles.note} role="status">
+          {state === undefined ? '' : state === 'error' ? 'Kalender could not reach the server. Your Reminders still show here in Kalender.' : pushText[state]}
+        </p>
+        {button}
+      </div>
     </section>
   );
 }
@@ -149,6 +214,7 @@ export function SettingsPage() {
         </div>
       </section>
       <DefaultLeadTime />
+      <PhoneNotifications />
       <DeleteAccount />
       <section className={styles.rows} aria-label="System status" aria-live="polite">
         <div className={styles.row}>

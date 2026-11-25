@@ -14,7 +14,7 @@ afterAll(closePool);
 
 const PASSWORD = 'kal-5-baje-meeting';
 const SENT = new Date(Date.now() - 30 * 60_000);
-const OWNED = ['sessions', 'approved_chats', 'source_messages', 'detected_events', 'confirmed_events', 'reminders', 'reminder_settings', 'in_app_notifications', 'jobs', 'outbox'];
+const OWNED = ['sessions', 'approved_chats', 'source_messages', 'detected_events', 'confirmed_events', 'reminders', 'reminder_settings', 'in_app_notifications', 'push_subscriptions', 'jobs', 'outbox'];
 
 /** One Android export line sent at SENT, in the 12-hour PKT format. */
 function line(text: string) {
@@ -40,7 +40,7 @@ async function approve(agent: request.Agent, name: string, file: Buffer) {
   return res.body.chat.id as string;
 }
 
-/** A User with data of every kind (S09-2): an active and a Revoked Chat, Detected and Confirmed Events, settings and a notification. */
+/** A User with data of every kind (S09-2): an active and a Revoked Chat, Detected and Confirmed Events, settings, a notification and a push subscription. */
 async function fullUser() {
   const u = await user();
   await approve(u.agent, 'Delete Class', exportFile('Meeting tomorrow at 3pm in Room 4', 'agle hafte presentation hai'));
@@ -50,6 +50,8 @@ async function fullUser() {
   expect((await u.agent.post(`/api/detected-events/${meeting.id}/confirm`)).status).toBe(201);
   expect((await u.agent.post('/api/events').send({ title: 'Study group', date: pktParts(new Date(Date.now() + 86_400_000)).date })).status).toBe(201);
   expect((await u.agent.put('/api/settings/reminders').send({ defaultLeadMinutes: 60 })).status).toBe(200);
+  const phone = { endpoint: `https://push.example.test/${u.userId}`, keys: { p256dh: 'BPublicKeyOfThisBrowser', auth: 'authSecret' } };
+  expect((await u.agent.post('/api/push-subscriptions').send(phone)).status).toBe(201);
   await db().query(
     `insert into in_app_notifications (user_id, event_id, title, date, reminder_at, kind) values ($1, gen_random_uuid(), 'Meeting', current_date, now(), 'due')`,
     [u.userId],
@@ -87,7 +89,7 @@ describe.skipIf(!hasDb)('delete the account (FR-13, MF-07)', () => {
     expect((await gone.agent.delete('/api/account').send({ password: PASSWORD })).status).toBe(204);
     expect(await rows(gone.userId)).toEqual(none);
     expect(await rows(other.userId)).toEqual(otherBefore);
-  });
+  }, 120_000); // seeds two Users with data of every kind; the Neon dev branch is slow (S05 section 6)
 
   it('S09-1 AC-13.1: afterwards the old session, approving, updating and signing in all answer 401', async () => {
     const { agent, email } = await user();

@@ -11,13 +11,15 @@
     "express": "^5.3.0",
     "fflate": "^0.8.3",
     "multer": "^2.5.0",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "web-push": "^4.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/multer": "^2.3.0",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
+    "@types/web-push": "^3.6.4",
     "supertest": "^7.3.2",
     "tsx": "^4.23.15"
   }

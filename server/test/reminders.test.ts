@@ -8,6 +8,7 @@ import { app } from '../src/app';
 import { confirm, createManual, deleteConfirmed, editConfirmed, ingestMessages, listDetected, review } from '../src/modules/events';
 import { tick } from '../src/modules/jobs';
 import { setDefaultLeadTime, setEventReminder } from '../src/modules/reminders';
+import { setPushSender, whenText, type PushSender } from '../src/modules/reminders/service';
 import { closePool, db, withTransaction } from '../src/shared/db';
 import { pktToUtc } from '../src/shared/time';
 import { hasDb, uniqueEmail } from './db';
@@ -251,5 +252,177 @@ describe.skipIf(!hasDb)('tick route (ADR-002)', () => {
     expect(ok.status).toBe(200);
     expect(ok.body).toMatchObject({ outbox: expect.any(Number), jobs: expect.any(Number), tasks: { 'reminders.deliverDue': expect.any(Number) } });
     vi.useRealTimers();
+  });
+});
+
+// S10: web push (FR-09, C-05). Times are in July 2020, after every June 2020 tick above, so these ticks reach only rows from these tests.
+const J = (day: number, h: number, m: number, s = 0) => new Date(pktToUtc(2020, 7, day, h, m).getTime() + s * 1000);
+const JD = (day: number) => `2020-07-${String(day).padStart(2, '0')}`;
+const sub = (name: string) => ({ endpoint: `https://push.example.test/${name}-${randomUUID()}`, keys: { p256dh: 'BPublicKeyOfThisBrowser', auth: 'authSecret' } });
+
+type Pushed = { endpoint: string; payload: { title: string; body: string; tag: string; url: string } };
+
+/** A fake push service that records each push and answers `status` (or the status for that endpoint). */
+function fakePush(status: number | ((endpoint: string) => number) = 201): Pushed[] {
+  const sent: Pushed[] = [];
+  const sender: PushSender = async (s, payload) => {
+    sent.push({ endpoint: s.endpoint, payload: JSON.parse(payload) });
+    return typeof status === 'number' ? status : status(s.endpoint);
+  };
+  setPushSender(sender);
+  return sent;
+}
+
+async function subscribe(agent: request.Agent, body: object = sub('phone')) {
+  const res = await agent.post('/api/push-subscriptions').send(body);
+  return { status: res.status, id: res.body.id as string, body: res.body };
+}
+
+const subscriptionRows = async (userId: string) =>
+  (await db().query<{ endpoint: string }>('select endpoint from push_subscriptions where user_id = $1 order by created_at, endpoint', [userId])).rows.map((r) => r.endpoint);
+
+describe.skipIf(!hasDb)('push routes (S10)', () => {
+  it('S10-1 the public key is answered when the VAPID keys are set, 404 when not, 401 signed out', async () => {
+    const { agent } = await user();
+    vi.stubEnv('VAPID_PUBLIC_KEY', 'BTestPublicKey');
+    vi.stubEnv('VAPID_PRIVATE_KEY', 'test-private');
+    vi.stubEnv('VAPID_SUBJECT', 'https://kalender.example.test');
+    expect((await agent.get('/api/push/public-key')).body).toEqual({ publicKey: 'BTestPublicKey' });
+    expect((await request(app).get('/api/push/public-key')).status).toBe(401);
+    vi.stubEnv('VAPID_PRIVATE_KEY', '');
+    const off = await agent.get('/api/push/public-key');
+    expect(off.status).toBe(404);
+    expect(off.body).toEqual({ error: 'push_not_configured' });
+    vi.unstubAllEnvs();
+  });
+
+  it('S10-2 a valid subscription answers 201; the endpoint is checked at its boundaries; the same endpoint keeps one row and moves User', async () => {
+    const a = await user();
+    const b = await user();
+    const prefix = 'https://push.example.test/';
+    const at1000 = { ...sub('x'), endpoint: prefix + 'a'.repeat(1000 - prefix.length - 36) + randomUUID() };
+    expect(at1000.endpoint).toHaveLength(1000);
+    expect((await subscribe(a.agent, at1000)).status).toBe(201);
+    const bad = [
+      { ...sub('x'), endpoint: 'http://push.example.test/plain' },
+      { ...sub('x'), endpoint: 'not a url' },
+      { ...sub('x'), endpoint: at1000.endpoint + 'b' },
+      { endpoint: sub('x').endpoint, keys: { p256dh: 'BKey' } },
+      { endpoint: sub('x').endpoint, keys: { p256dh: 42, auth: 'x' } },
+      {},
+    ];
+    for (const body of bad) {
+      const res = await subscribe(a.agent, body);
+      expect(res.status, JSON.stringify(body).slice(0, 60)).toBe(400);
+      expect(res.body.error).toBe('invalid');
+    }
+    expect(await subscriptionRows(a.userId)).toEqual([at1000.endpoint]);
+    const phone = sub('shared-phone');
+    const first = await subscribe(a.agent, phone);
+    expect((await subscribe(a.agent, phone)).id).toBe(first.id);
+    expect((await subscriptionRows(a.userId)).sort()).toEqual([at1000.endpoint, phone.endpoint].sort());
+    expect((await subscribe(b.agent, phone)).id).toBe(first.id);
+    expect(await subscriptionRows(a.userId)).toEqual([at1000.endpoint]);
+    expect(await subscriptionRows(b.userId)).toEqual([phone.endpoint]);
+  });
+
+  it("S10-3 a User deletes their own subscription; another User's id answers 404 and changes nothing", async () => {
+    const a = await user();
+    const b = await user();
+    const { id } = await subscribe(a.agent);
+    expect((await b.agent.delete(`/api/push-subscriptions/${id}`)).status).toBe(404);
+    expect(await subscriptionRows(a.userId)).toHaveLength(1);
+    expect((await a.agent.delete(`/api/push-subscriptions/${id}`)).status).toBe(204);
+    expect(await subscriptionRows(a.userId)).toEqual([]);
+    expect((await a.agent.delete(`/api/push-subscriptions/${id}`)).status).toBe(404);
+  });
+});
+
+describe.skipIf(!hasDb)('push delivery (S10)', () => {
+  it("S10-4 AC-09.1 Q-23, S10-7 BR-11: on-time and late Reminders go to each of the User's phones with title and time; missed ones and other Users get none", async () => {
+    const sent = fakePush();
+    const a = await user();
+    const b = await user();
+    const [p1, p2] = [sub('a-phone'), sub('a-tablet')];
+    await subscribe(a.agent, p1);
+    await subscribe(a.agent, p2);
+    const bPhone = sub('b-phone');
+    await subscribe(b.agent, bPhone);
+    await event(a.userId, { title: 'Project meeting', date: JD(1), time: '17:00' }, J(1, 9, 0)); // Reminder 16:30
+    await event(a.userId, { title: 'Viva', date: JD(1), time: '18:00' }, J(1, 9, 0)); // 17:30
+    await event(a.userId, { title: 'Lab', date: JD(1), time: '19:00' }, J(1, 9, 0)); // 18:30
+    await event(b.userId, { title: 'Other', date: JD(1), time: '17:00' }, J(1, 9, 0)); // b's own Reminder, pushed to b only
+
+    await tick(db(), J(1, 16, 31)); // 1 minute after: on time
+    const meeting = sent.filter((s) => s.payload.title === 'Project meeting');
+    expect(meeting.map((s) => s.endpoint).sort()).toEqual([p1.endpoint, p2.endpoint].sort());
+    expect(meeting[0].payload).toEqual({ title: 'Project meeting', body: 'Today, 5:00 pm', tag: expect.any(String), url: '/' });
+    expect(sent.filter((s) => s.payload.title === 'Other').map((s) => s.endpoint)).toEqual([bPhone.endpoint]);
+
+    await tick(db(), J(1, 17, 40)); // 10 minutes after: late, still pushed
+    expect(sent.filter((s) => s.payload.title === 'Viva')).toHaveLength(2);
+    await tick(db(), J(1, 18, 40, 1)); // 10 minutes and 1 second after: missed, in-app only
+    expect(sent.filter((s) => s.payload.title === 'Lab')).toEqual([]);
+    expect((await notifications(a.agent)).map((n) => [n.title, n.kind])).toEqual([
+      ['Project meeting', 'due'],
+      ['Viva', 'late'],
+      ['Lab', 'missed'],
+    ]);
+    expect(sent.filter((s) => s.endpoint === bPhone.endpoint).map((s) => s.payload.title)).toEqual(['Other']);
+    setPushSender(undefined);
+  }, 120_000); // seeds two Users and many ticks; the Neon dev branch is slow (S05 section 6)
+
+  it('S10-5 AC-09.3 C-05 a push that fails, or no push set up, never stops the in-app Reminder or its NFR-03 times', async () => {
+    setPushSender(async () => {
+      throw new Error('push service down');
+    });
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const a = await user();
+    await subscribe(a.agent);
+    const id = await event(a.userId, { date: JD(2), time: '15:00' }, J(2, 9, 0));
+    await tick(db(), J(2, 14, 30, 5));
+    expect(await reminder(id)).toMatchObject({ status: 'sent', delivered_at: J(2, 14, 30, 5) });
+    expect(await notifications(a.agent)).toMatchObject([{ eventId: id, kind: 'due' }]);
+    errors.mockRestore();
+
+    setPushSender(undefined);
+    vi.stubEnv('VAPID_PRIVATE_KEY', ''); // no keys: push is off
+    const b = await user();
+    await subscribe(b.agent);
+    const id2 = await event(b.userId, { date: JD(2), time: '16:00' }, J(2, 9, 0));
+    await tick(db(), J(2, 15, 30));
+    expect(await reminder(id2)).toMatchObject({ status: 'sent' });
+    expect(await notifications(b.agent)).toMatchObject([{ eventId: id2, kind: 'due' }]);
+    vi.unstubAllEnvs();
+  });
+
+  it('S10-6 404 and 410 delete the subscription; 500 and a timeout keep it; the log holds the status only', async () => {
+    const answers: Record<string, number> = {};
+    const sent = fakePush((endpoint) => answers[endpoint]);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const a = await user();
+    const phones = { gone410: sub('gone410'), gone404: sub('gone404'), error500: sub('error500'), timeout: sub('timeout') };
+    const codes = { gone410: 410, gone404: 404, error500: 500, timeout: 0 };
+    for (const [name, p] of Object.entries(phones)) {
+      answers[p.endpoint] = codes[name as keyof typeof codes];
+      await subscribe(a.agent, p);
+    }
+    await event(a.userId, { title: 'Secret plan', date: JD(3), time: '15:00' }, J(3, 9, 0));
+    await tick(db(), J(3, 14, 30));
+    expect(sent).toHaveLength(4);
+    expect((await subscriptionRows(a.userId)).sort()).toEqual([phones.error500.endpoint, phones.timeout.endpoint].sort());
+    const logged = errors.mock.calls.map((c) => String(c[0])).filter((l) => l.includes('reminders.push'));
+    expect(logged.map((l) => JSON.parse(l).status).sort()).toEqual([0, 500]);
+    expect(logged.join(' ')).not.toMatch(/Secret plan|push\.example\.test/);
+    errors.mockRestore();
+    setPushSender(undefined);
+  });
+
+  it('S10 notification time text in PKT: today, tomorrow, a later date and All-day', () => {
+    const now = J(4, 23, 59);
+    expect(whenText(JD(4), '09:05', now)).toBe('Today, 9:05 am');
+    expect(whenText(JD(5), '12:00', now)).toBe('Tomorrow, 12:00 pm');
+    expect(whenText(JD(5), '00:30', now)).toBe('Tomorrow, 12:30 am');
+    expect(whenText(JD(10), null, now)).toBe('Fri 10 Jul, all day');
   });
 });
