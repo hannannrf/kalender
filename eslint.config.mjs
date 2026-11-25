@@ -68,4 +68,8 @@ export default tseslint.config(
     files: ['web/**/*.{ts,tsx}'],
     languageOptions: { globals: globals.browser },
   },
+  {
+    files: ['web/public/sw.js'],
+    languageOptions: { globals: globals.serviceworker },
+  },
 );

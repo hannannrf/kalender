@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api, ApiError } from './api';
+import { forgetThisPhone } from './push';
 
 type Account = { email: string };
 type State = { status: 'loading' } | { status: 'signed-out'; notice?: string } | { status: 'signed-in'; account: Account } | { status: 'offline' };
@@ -37,11 +38,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     signIn: enter('/auth/sign-in'),
     register: enter('/auth/register'),
     signOut: async () => {
+      await forgetThisPhone(); // S10 decision 4: a shared phone stops getting this User's Reminders
       await api('/auth/sign-out', { method: 'POST' });
       setState({ status: 'signed-out' });
     },
     deleteAccount: async (password) => {
       await api('/account', { method: 'DELETE', body: { password } });
+      await forgetThisPhone();
       setState({ status: 'signed-out', notice: 'Your account and everything in it are deleted.' });
     },
     retry: load,

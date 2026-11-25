@@ -128,9 +128,39 @@ export async function purgeNotificationsSystem(db: Db, before: Date): Promise<nu
   return res.rowCount ?? 0;
 }
 
-/** AC-13.3: the User's Reminders (with their copies of Event details), Lead Time setting and in-app notifications. */
+// ---- Push subscriptions (S10) ----
+
+export type PushSubscriptionRow = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string };
+
+/** One row per endpoint: the same phone sent again keeps its row and moves it to the current User. */
+export async function upsertSubscription(db: Db, userId: string, s: { endpoint: string; p256dh: string; auth: string }): Promise<string> {
+  const res = await db.query<{ id: string }>(
+    `insert into push_subscriptions (user_id, endpoint, p256dh, auth) values ($1, $2, $3, $4)
+     on conflict (endpoint) do update set user_id = excluded.user_id, p256dh = excluded.p256dh, auth = excluded.auth, created_at = now()
+     returning id`,
+    [userId, s.endpoint, s.p256dh, s.auth],
+  );
+  return res.rows[0].id;
+}
+
+export async function deleteSubscription(db: Db, userId: string, id: string): Promise<boolean> {
+  const res = await db.query('delete from push_subscriptions where user_id = $1 and id = $2', [userId, id]);
+  return res.rowCount === 1;
+}
+
+export async function listSubscriptionsSystem(db: Db, userIds: string[]): Promise<PushSubscriptionRow[]> {
+  const res = await db.query<PushSubscriptionRow>('select id, user_id, endpoint, p256dh, auth from push_subscriptions where user_id = any($1::uuid[])', [userIds]);
+  return res.rows;
+}
+
+export async function deleteSubscriptionSystem(db: Db, id: string): Promise<void> {
+  await db.query('delete from push_subscriptions where id = $1', [id]);
+}
+
+/** AC-13.3: the User's Reminders (with their copies of Event details), Lead Time setting, in-app notifications and push subscriptions. */
 export async function deleteAllForUser(db: Db, userId: string): Promise<void> {
   await db.query('delete from reminders where user_id = $1', [userId]);
   await db.query('delete from reminder_settings where user_id = $1', [userId]);
   await db.query('delete from in_app_notifications where user_id = $1', [userId]);
+  await db.query('delete from push_subscriptions where user_id = $1', [userId]);
 }

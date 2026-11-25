@@ -45,3 +45,24 @@ router.post('/notifications/:id/seen', async (req, res) => {
   if (await service.markSeen(db(), userIdOf(req), id, new Date())) res.status(204).end();
   else notFound(res);
 });
+
+// ---- Web push (S10) ----
+
+router.get('/push/public-key', (_req, res) => {
+  const publicKey = service.pushPublicKey();
+  if (publicKey) res.json({ publicKey });
+  else res.status(404).json({ error: 'push_not_configured' });
+});
+
+router.post('/push-subscriptions', async (req, res) => {
+  const result = await service.registerPushSubscription(db(), userIdOf(req), req.body ?? {});
+  if ('invalid' in result) res.status(400).json({ error: 'invalid', fields: result.invalid });
+  else res.status(201).json(result);
+});
+
+router.delete('/push-subscriptions/:id', async (req, res) => {
+  const id = idOf(req, res);
+  if (!id) return;
+  if (await service.removePushSubscription(db(), userIdOf(req), id)) res.status(204).end();
+  else notFound(res);
+});

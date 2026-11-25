@@ -249,6 +249,7 @@ Every step is batched, uses `FOR UPDATE SKIP LOCKED`, and is safe to run twice.
 | Processed jobs, outbox and delivery records | 7 days |
 | In-app notifications | 7 days after creation |
 | Sessions | 30 days |
+| Push subscriptions (`reminders`: the browser's push endpoint and its two keys; added in S10) | The User turns phone notifications off or signs out on that phone, the push service answers 404 or 410, or the account is deleted |
 | Past Confirmed Events | The User deletes them or the account (hidden from the list by AC-11.2) |
 
 - **NFR evidence:** each `reminders` row keeps `reminder_at`, `delivered_at` and status, kept until the Event or account is deleted. A script exports the NFR-03 table, so the evidence does not depend on short-lived platform logs. Uploads log counts and durations only (NFR-02).
