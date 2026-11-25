@@ -131,3 +131,15 @@ Known limits:
   - registering the same email again answered 201. The new account has no Events and the default Lead Time of 30 minutes (MF-07);
   - that second account was deleted the same way (204), and signing in afterwards answered 401.
   - The first attempt at this check sent every call after registering without the session cookie (the cookie file path was wrong), so all of them answered 401 and nothing was deleted. The check was then run again on the same account with the cookie file fixed, as listed above.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 25 Nov 2026 ("Accept, merge and tag"). Reason: criteria S09-1 to S09-8 pass in CI, on the deployed preview and in the manual phone-size check. Accepted with these known limits: the Google token part of AC-13.3 waits for S11, which adds `calendar-sync.deleteAllForUser` as one more step; there is no "Forgot password", so a User who forgot their password cannot delete their account from the app; two heavy S09 tests time out on Neon `dev` when the whole suite runs, as recorded for earlier slices.
+
+## 8. Integrate
+
+PR #10 merged into `main` with a merge commit, tagged `S09-accepted`; CI on `main` is Gate 4. No migration and no new dependency in this slice.
+
+## 9. Context updated
+
+`plan.md` v10 (copy in `docs/plan-history/plan-v10.md`): S09 Accepted, AC-13.3 marked partial for S09 and added to S11. Row 12 added to `evidence/workflow-evidence-log.md`.
