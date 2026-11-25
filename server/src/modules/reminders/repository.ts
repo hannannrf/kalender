@@ -127,3 +127,10 @@ export async function purgeNotificationsSystem(db: Db, before: Date): Promise<nu
   const res = await db.query('delete from in_app_notifications where created_at < $1', [before]);
   return res.rowCount ?? 0;
 }
+
+/** AC-13.3: the User's Reminders (with their copies of Event details), Lead Time setting and in-app notifications. */
+export async function deleteAllForUser(db: Db, userId: string): Promise<void> {
+  await db.query('delete from reminders where user_id = $1', [userId]);
+  await db.query('delete from reminder_settings where user_id = $1', [userId]);
+  await db.query('delete from in_app_notifications where user_id = $1', [userId]);
+}

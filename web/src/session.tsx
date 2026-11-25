@@ -2,12 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { api, ApiError } from './api';
 
 type Account = { email: string };
-type State = { status: 'loading' } | { status: 'signed-out' } | { status: 'signed-in'; account: Account } | { status: 'offline' };
+type State = { status: 'loading' } | { status: 'signed-out'; notice?: string } | { status: 'signed-in'; account: Account } | { status: 'offline' };
 
 type Session = State & {
   signIn: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /** FR-13: throws ApiError 403 with fields.password when the password is wrong. */
+  deleteAccount: (password: string) => Promise<void>;
   retry: () => void;
 };
 
@@ -37,6 +39,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     signOut: async () => {
       await api('/auth/sign-out', { method: 'POST' });
       setState({ status: 'signed-out' });
+    },
+    deleteAccount: async (password) => {
+      await api('/account', { method: 'DELETE', body: { password } });
+      setState({ status: 'signed-out', notice: 'Your account and everything in it are deleted.' });
     },
     retry: load,
   };

@@ -62,6 +62,12 @@ export function AuthPage({ mode }: { mode: Mode }) {
       <form className={styles.card} onSubmit={submit} noValidate aria-labelledby="auth-title">
         <h2 id="auth-title">{text.title}</h2>
 
+        {session.status === 'signed-out' && session.notice && (
+          <p className={styles.notice} role="status">
+            {session.notice}
+          </p>
+        )}
+
         {errors.form && (
           <p className={styles.formError} role="alert">
             {errors.form}

@@ -1,6 +1,6 @@
 // S00 placeholder screens. Each grows into its own file in the slice that fills it.
-import { useEffect, useState } from 'react';
-import { api } from '../api';
+import { useEffect, useState, type FormEvent } from 'react';
+import { api, ApiError } from '../api';
 import { LEAD_MINUTES, leadText } from '../format';
 import { useSession } from '../session';
 import styles from './Page.module.css';
@@ -59,6 +59,57 @@ function DefaultLeadTime() {
   );
 }
 
+/** FR-13, MF-07: deletes the account and everything it owns once the password is typed again. */
+function DeleteAccount() {
+  const session = useSession();
+  const [error, setError] = useState<string>();
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const password = String(new FormData(event.currentTarget).get('password') ?? '');
+    setBusy(true);
+    setError(undefined);
+    try {
+      await session.deleteAccount(password);
+    } catch (err) {
+      setError(err instanceof ApiError && err.body.fields?.password ? err.body.fields.password : 'Kalender could not reach the server. Your account is not deleted.');
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className={styles.rows} aria-labelledby="delete-heading">
+      <h2 id="delete-heading" className={styles.sectionTitle}>
+        Delete account
+      </h2>
+      <form className={styles.deleteForm} onSubmit={submit} noValidate>
+        <p>
+          This deletes your account, your Approved Chats, Detected and Confirmed Events, Reminders and settings. It cannot be undone. Copies already in Google
+          Calendar stay there.
+        </p>
+        <label htmlFor="delete-password">Type your password to confirm</label>
+        <input
+          id="delete-password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? 'delete-error' : undefined}
+        />
+        {error && (
+          <p id="delete-error" className={styles.fieldError}>
+            {error}
+          </p>
+        )}
+        <button type="submit" className={styles.danger} disabled={busy}>
+          {busy ? 'Deleting…' : 'Delete my account'}
+        </button>
+      </form>
+    </section>
+  );
+}
+
 export function SettingsPage() {
   const session = useSession();
   const [health, setHealth] = useState<Health | 'error' | undefined>();
@@ -98,6 +149,7 @@ export function SettingsPage() {
         </div>
       </section>
       <DefaultLeadTime />
+      <DeleteAccount />
       <section className={styles.rows} aria-label="System status" aria-live="polite">
         <div className={styles.row}>
           <span className={styles.label}>Server</span>

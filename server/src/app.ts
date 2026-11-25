@@ -15,6 +15,7 @@ app.use(express.json({ limit: '100kb' }));
 // Each module registers its job handlers, outbox subscribers and tick tasks once (Q-1).
 events.register(jobs);
 reminders.register(jobs);
+identity.register(jobs);
 
 app.get('/api/health', async (_req, res) => {
   const pool = getPool();

@@ -145,3 +145,12 @@
   font-weight: 700;
   text-underline-offset: 3px;
 }
+
+/* After an account deletion (FR-13): a plain confirmation, not an error. */
+.notice {
+  background: var(--surface);
+  border-left: var(--bar-width) solid var(--chat-4);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+  font-weight: 500;
+}

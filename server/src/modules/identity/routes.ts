@@ -86,6 +86,16 @@ export function requireUser(): RequestHandler {
 /** Mounted after requireUser(). */
 export const router = Router();
 
+/** FR-13, MF-07: the password is asked again (S09 Gate 1). Afterwards the cookie is cleared and the session no longer works. */
+router.delete('/account', async (req, res) => {
+  if ((await service.deleteAccount(db(), userIdOf(req), req.body?.password, new Date())) === 'wrong_password') {
+    res.status(403).json({ error: 'wrong_password', fields: { password: 'This password is wrong. Your account is not deleted.' } });
+    return;
+  }
+  res.clearCookie(COOKIE, cookieOptions());
+  res.status(204).end();
+});
+
 router.get('/me', async (req, res) => {
   const me = await service.me(db(), userIdOf(req));
   if (!me) {
