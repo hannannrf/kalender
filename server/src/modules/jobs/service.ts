@@ -88,9 +88,10 @@ export async function dispatchOutbox(db: Pool, now: Date, options: { limit: numb
 const MAX_ATTEMPTS = 3;
 
 /** Runs up to `limit` due jobs, each in its own transaction. A failed job is tried again a minute later, three times at most. */
-export async function runDueJobs(db: Pool, now: Date, limit: number): Promise<number> {
+export async function runDueJobs(db: Pool, now: Date, limit: number, timeBudgetMs = Infinity): Promise<number> {
+  const started = Date.now();
   let ran = 0;
-  while (ran < limit) {
+  while (ran < limit && Date.now() - started <= timeBudgetMs) {
     const outcome = await withTransaction(db, async (tx) => {
       const job = await repo.claimDueJobSystem(tx, now);
       if (!job) return 'none' as const;
@@ -117,11 +118,11 @@ export type TickResult = { outbox: number; jobs: number; tasks: Record<string, n
 
 /**
  * One tick (ADR-002, R2-1): the outbox first, so a pending delete or edit reaches its subscribers
- * before a stale Reminder could be sent; then due jobs; then tick tasks such as Reminder delivery.
+ * before a stale Reminder could be sent; then tick tasks such as Reminder delivery, which are
+ * time-critical (NFR-03); then due jobs, within a time budget, so a job backlog never delays Reminders (S13).
  */
 export async function tick(db: Pool, now: Date): Promise<TickResult> {
   const outbox = await dispatchOutbox(db, now, { limit: 200, timeBudgetMs: 20_000 });
-  const jobs = await runDueJobs(db, now, 50);
   const tasks: Record<string, number> = {};
   for (const [name, fn] of tickTasks) {
     try {
@@ -131,6 +132,7 @@ export async function tick(db: Pool, now: Date): Promise<TickResult> {
       tasks[name] = -1;
     }
   }
+  const jobs = await runDueJobs(db, now, 50, 20_000);
   return { outbox, jobs, tasks };
 }
 

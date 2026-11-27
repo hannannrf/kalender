@@ -6,7 +6,7 @@ import request from 'supertest';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { app } from '../src/app';
 import { confirm, createManual, deleteConfirmed, editConfirmed, ingestMessages, listDetected, review } from '../src/modules/events';
-import { tick } from '../src/modules/jobs';
+import { enqueue, registerHandler, tick } from '../src/modules/jobs';
 import { setDefaultLeadTime, setEventReminder } from '../src/modules/reminders';
 import { setPushSender, whenText, type PushSender } from '../src/modules/reminders/service';
 import { closePool, db, withTransaction } from '../src/shared/db';
@@ -425,5 +425,20 @@ describe.skipIf(!hasDb)('push delivery (S10)', () => {
     expect(whenText(JD(5), '00:30', now)).toBe('Kal, 12:30 am');
     expect(whenText(JD(6), null, now)).toBe('Parson, All day');
     expect(whenText(JD(10), null, now)).toBe('Fri 10 Jul, All day');
+  });
+});
+
+describe.skipIf(!hasDb)('Tick order (NFR-03, S13)', () => {
+  it('S13-3 NFR-03 due Reminders are delivered before due jobs run, so a job backlog never delays them', async () => {
+    const { userId } = await user();
+    const id = await event(userId, { date: D(20), time: '15:00' }, T(20, 14, 0));
+    const seenByJob: (string | undefined)[] = [];
+    registerHandler('test.s13Backlog', async () => {
+      seenByJob.push((await reminder(id))?.status);
+    });
+    await withTransaction(db(), (tx) => enqueue(tx, 'test.s13Backlog', {}, { runAt: T(20, 14, 30), userId, dedupeKey: randomUUID() }));
+    await tick(db(), T(20, 14, 30, 5));
+    expect(seenByJob).toEqual(['sent']);
+    expect(await reminder(id)).toMatchObject({ status: 'sent', delivered_at: T(20, 14, 30, 5) });
   });
 });
