@@ -2,11 +2,15 @@
 
 | Field | Value |
 |---|---|
-| Version | 1.2 (product renamed for Deliverable 4; no requirement changed) |
-| Previous version | 1.1 (Validated: TA change requests applied and confirmed with Mahd) |
+| Version | 1.3 (OQ-05 closed: the upload nudge is not built) |
+| Previous version | 1.2 (product renamed for Deliverable 4; no requirement changed) |
 | Course | ISE1003 Introduction to Software Engineering, Deliverable 3 input |
 | Client | Mahd Ahmed |
 | Team | Abdul Hannan Rauf, Zain Amjad, Muhammad Areeb |
+
+## Changes in v1.3
+
+OQ-05 and D-19 are closed: the daily nudge to upload new exports is **not built**. It was planned as the Could-have slice S12 with a new FR-14 that would be added only if built (D-27). The team cut S12 on 28 Nov 2026 to finish Deliverable 4, and Mahd agreed (D-29). No FR, NFR, BR, constraint, acceptance criterion or threshold changed. Users still upload new exports themselves (NG-12, FR-03).
 
 ## Changes in v1.2
 
@@ -325,7 +329,7 @@ Unless stated otherwise, example messages are sent on Monday 19 October 2026 at 
 | OQ-02 | Which phone-first platform is feasible, including uploading a Chat Export from the phone and reliable phone notifications within free tiers? | Open; decided as an architecture decision in Deliverable 3. It no longer depends on OQ-01. | C-04, C-05, FR-09 |
 | OQ-03 | What numeric detection-accuracy threshold is acceptable? | **Resolved in v1.1:** NFR-05 thresholds M1 to M4 on the Detection Test Set, confirmed by Mahd (D-17). | FR-05, NFR-05, AC-05.8 |
 | OQ-04 | Is a "Snooze" option for Reminders required? It appeared in the Deliverable 1 prototype, but the team has not decided whether it is in scope. If it is, NG-07 must change to allow a snoozed repeat. | Open | FR-09, NG-07 |
-| OQ-05 | *(v1.1)* Should the system remind the User to upload new exports of their Approved Chats (for example once a day), since Events are found only in uploaded messages (NG-12)? | Open (D-19). If Mahd wants it, it becomes a new FR. | NG-12, FR-03 |
+| OQ-05 | *(v1.1)* Should the system remind the User to upload new exports of their Approved Chats (for example once a day), since Events are found only in uploaded messages (NG-12)? | Closed in v1.3: not built (S12 cut, D-29). | NG-12, FR-03 |
 
 ## Change log v1.0 → v1.1 (decisions confirmed with Mahd)
 
@@ -336,7 +340,7 @@ Unless stated otherwise, example messages are sent on Monday 19 October 2026 at 
 | D-16 | The Event Message criteria (BR-20), the date and time rules (BR-12) and the ambiguity rules U1–U9 (BR-21). A day name on its own weekday now means 7 days later (v1.0 read it as the same day, which made "Monday ko paper hai" sent on a Monday a past Event). | TA CR-2 | BR-12, BR-17, BR-20, BR-21, MF-03, AC-05.1–AC-05.13 |
 | D-17 | Detection thresholds M1–M4 on the 80-message Detection Test Set. | TA CR-2; resolves OQ-03 | NFR-05, AC-05.8, Appendix A |
 | D-18 | Every Uncertain detail must be accepted or corrected before a Detected Event can be confirmed. | TA CR-2 | FR-06, BR-21, AC-06.1, AC-06.7, AC-06.8 |
-| D-19 | Whether to add a daily reminder to upload new exports: still open. | CR-1 consequence | OQ-05 |
+| D-19 | Whether to add a daily reminder to upload new exports: closed in v1.3, not built (D-29). | CR-1 consequence | OQ-05 |
 
 Removed in v1.1: unlinking a WhatsApp Account (old BR-15, AC-02.1 "connected", AC-13.2), because there is no longer a WhatsApp connection. Revoking a Chat (BR-06) and deleting the account (MF-07) cover the same privacy needs.
 
