@@ -3,7 +3,9 @@
   inset: auto 0 0 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--card);
+  background: color-mix(in srgb, var(--card) 86%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border-top: 1px solid var(--line);
   padding: var(--space-1) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom));
 }
@@ -34,12 +36,22 @@
 .icon {
   position: relative;
   display: inline-flex;
+  justify-content: center;
+  width: 3.5rem;
+  padding: 2px 0;
+  border-radius: 999px;
+  transition: background-color 160ms ease-out;
+}
+
+/* S15: the open tab gets a pill behind its icon, as well as the bold label. */
+.active .icon {
+  background: var(--surface);
 }
 
 .badge {
   position: absolute;
   top: -4px;
-  left: 14px;
+  left: 30px;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;

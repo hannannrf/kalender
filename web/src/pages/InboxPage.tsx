@@ -5,7 +5,8 @@ import { api } from '../api';
 import { EmptyState } from '../components/EmptyState';
 import { Notice } from '../components/Notice';
 import { Placeholder } from '../components/Placeholder';
-import { AlertIcon } from '../components/icons';
+import { ChatAvatar, chatStyle } from '../components/ChatAvatar';
+import { AlertIcon, InboxIcon } from '../components/icons';
 import { dayText, timeText } from '../format';
 import pageStyles from './Page.module.css';
 import styles from './InboxPage.module.css';
@@ -39,7 +40,7 @@ function EventCard({ event }: { event: DetectedEvent }) {
   const check = event.uncertain.length > 0 || event.date === null;
   return (
     <li>
-      <Link to={`/review/${event.id}`} className={styles.card} style={{ borderLeftColor: `var(--chat-${event.chat.colour})` }}>
+      <Link to={`/review/${event.id}`} className={styles.card} style={chatStyle(event.chat.colour)}>
         <p className={styles.title}>
           <Value marked={event.uncertain.includes('event')}>{event.title}</Value>
         </p>
@@ -77,20 +78,29 @@ export function InboxPage() {
   return (
     <main className={pageStyles.page}>
       <h1 className={pageStyles.title}>Inbox</h1>
+      {Array.isArray(events) && events.length > 0 && (
+        <p className={styles.subtitle}>
+          {events.length} {events.length === 1 ? 'Event' : 'Events'} to check
+        </p>
+      )}
       <Notice />
       {events === undefined && <Placeholder label="Loading your Inbox…" />}
       {events === 'error' && <p className={styles.problem}>Kalender could not load your Inbox. Check your connection and open it again.</p>}
       {Array.isArray(events) && events.length === 0 && (
-        <EmptyState title="Nothing to check">
+        <EmptyState title="Nothing to check" icon={<InboxIcon />}>
           Upload a Chat Export from Chats. The Events Kalender finds wait here until you check them.
         </EmptyState>
       )}
       {Array.isArray(events) &&
         groupByChat(events).map(({ chat, events: inChat }) => (
           <section key={chat.id} aria-labelledby={`chat-${chat.id}`} className={styles.group}>
-            <h2 id={`chat-${chat.id}`} className={styles.chatName}>
-              <span className={styles.dot} style={{ background: `var(--chat-${chat.colour})` }} aria-hidden="true" />
+            <h2 id={`chat-${chat.id}`} className={`${styles.chatName} ${styles.chatHead}`}>
+              <ChatAvatar name={chat.name} colour={chat.colour} />
               {chat.name}
+              <span className={styles.count}>
+                {inChat.length}
+                <span className="sr-only"> to check</span>
+              </span>
             </h2>
             <ul className={styles.list}>
               {inChat.map((e) => (

@@ -38,3 +38,13 @@ export const sentText = (iso: string) => sentFormat.format(new Date(iso));
 /** Lead Times the User may choose (BR-07). */
 export const LEAD_MINUTES = [10, 30, 60, 1440] as const;
 export const leadText = (minutes: number) => ({ 10: '10 minutes', 30: '30 minutes', 60: '1 hour', 1440: '1 day' })[minutes] ?? `${minutes} minutes`;
+
+/** "in 40 min" or "in 5 hours" for a timed Event less than a day away (S15 Next up card); null otherwise. */
+export function untilText(date: string, time: string | null, now = Date.now()) {
+  if (!time) return null;
+  const minutes = Math.round((Date.parse(`${date}T${time}:00+05:00`) - now) / 60_000);
+  if (minutes < 0 || minutes >= 24 * 60) return null;
+  if (minutes < 60) return minutes <= 1 ? 'starting now' : `in ${minutes} min`;
+  const hours = Math.round(minutes / 60);
+  return `in ${hours} hour${hours === 1 ? '' : 's'}`;
+}

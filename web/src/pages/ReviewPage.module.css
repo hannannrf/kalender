@@ -18,9 +18,13 @@
 }
 
 .band {
-  border-radius: var(--radius-card);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-radius: var(--radius-sheet);
   padding: var(--space-4);
   color: var(--on-colour);
+  box-shadow: var(--shadow-raised);
 }
 
 .chatName {
@@ -36,9 +40,9 @@
 
 .quote blockquote {
   margin: 0;
-  background: var(--card);
+  background: color-mix(in srgb, var(--c) var(--tint), var(--card));
   border-radius: 4px var(--radius-card) var(--radius-card) var(--radius-card);
-  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
   padding: var(--space-3) var(--space-4);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -57,6 +61,7 @@
 .fields {
   background: var(--card);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   padding: 0 var(--space-4);
 }
 
