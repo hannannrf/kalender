@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v15 (28 Nov 2026) |
+| Plan version | v16 (28 Nov 2026) |
+| Changes from v15 | S15 added and Accepted: Light, Dark or Phone choice in Settings (stored on the phone only), Next up card, time column, Chat initials, cards tinted with the Chat colour. Presentation only |
 | Changes from v14 | S14 added and Accepted: UI polish (dates next to Aaj, Kal and Parson, Chat colour dots, loading placeholders, Confirm and Dismiss notice, message bubble) and dark mode that follows the phone. Presentation only |
 | Changes from v13 | S12 Cut (D-29, Mahd agreed); PRD v1.3 closes OQ-05 as not built. Every slice is now Accepted or Cut |
 | Changes from v12 | S13 Accepted with known gaps: Gate 5 passed on production; NFR-02 passed 20 of 20; NFR-03 run cut short at 29 of 50 (all 29 on time); NFR-04 not run (O-6). The tick now delivers Reminders before due jobs. O-5 done 28 Nov |
@@ -74,6 +75,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 | S12 | Upload nudge for stale Approved Chats (OQ-05, D-27) | new FR-14 | new AC-14.x | S07 | AFK | C | Thu 26 | Muhammad Areeb | Cut (D-29) | – |
 | S13 | Polish, Gate 5 end-to-end run, NFR-02/03/04 evidence | NFR-02..04 | all | all | HITL | M | Thu 26 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass; G5 pass |
 | S14 | UI polish and dark mode (after the deadline, presentation only) | FR-06, FR-11 (presentation), C-05 | – | S13 | HITL | S | Sat 28 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
+| S15 | Visual refresh and a Light or Dark choice (after the deadline, presentation only) | FR-05, FR-06, FR-11 (presentation), C-05 | – | S14 | HITL | S | Sat 28 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass |
 
 `*` The calendar part of that AC is closed in S11.
 

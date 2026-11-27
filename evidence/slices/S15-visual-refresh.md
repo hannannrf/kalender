@@ -93,3 +93,15 @@ Not checked:
 - the "in …" text on the Next up card;
 - the empty-state icon;
 - the Add Event and Edit Event forms in the new look.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 28 Nov 2026 ("Accept, merge both"). Reason: S15-1 to S15-6 pass on the screens checked, and CI is green on PR #17 (S15-7). Accepted with the limits listed at the end of section 6.
+
+## 8. Integrate
+
+PR #17 merged into `main` with a merge commit, tagged `S15-accepted`; CI on `main` is Gate 4. The change is in `web/` only. No migration, no new dependency, no server change and no new Vercel variable.
+
+## 9. Context updated
+
+`plan.md` v16 (copy in `docs/plan-history/plan-v16.md`): S15 added as Accepted. Row 18 added to `evidence/workflow-evidence-log.md`. The final report and contribution log name S14 and S15.
