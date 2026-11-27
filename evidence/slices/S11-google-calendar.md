@@ -131,3 +131,39 @@ Known limits:
 - Until the Google Cloud OAuth client exists, Settings shows "Not available yet" and no copy is made. The automated tests do not need it.
 - Google keeps the app in Testing mode, so a link ends after 7 days and Settings asks to connect again (ADR-002).
 - Retries run only when the tick runs (O-5).
+
+## 6. Checks
+
+- Local against the Neon `dev` branch:
+  - `calendar.test.ts` alone (`evidence/test-runs/S11-2026-11-25-neon-dev-calendar.txt`): **15 passed**. Lint, typecheck and build are clean.
+  - Full run (`evidence/test-runs/S11-2026-11-25-neon-dev.txt`): **196 passed, 5 failed**. Two failures came from S11 changing what other tests see, and both tests were fixed:
+    - S07-11 expected only the `reminders` subscriber; it now expects `calendar-sync` too.
+    - In S09-2, another User's late outbox delivery reached the calendar link that the test seeds. The test now dispatches the User's outbox before seeding the link.
+  - The other 3 failures (S07-4, S07-6 and S09-5) are the Neon `dev` slowness recorded in S05 section 6.
+  - A local rerun after the fixes was stopped by the network: Neon `dev` stopped answering on port 5432 from this machine. CI is the full check for the two fixed tests.
+- CI on PR #12 (Postgres 17): green. The main run had **201 passed, 2 skipped**, and the separate calendar run had **15 passed**. Vercel built the preview.
+- **S11-12, real Google account, on the S11 preview** (https://kalender-git-slice-s11-google-calendar-hannan-f17c.vercel.app, Neon `dev`), 27 Nov 2026:
+  - Setup:
+    - Abdul Hannan Rauf created the Google Cloud project "Kalender" with the agent's help: Calendar API enabled, External consent screen in Testing, his Gmail as the only test user, and a Web OAuth client "Kalender web" with the three redirect URIs in section 4. He clicked Create on the client and copied the client id and secret into `.env.local` himself.
+    - Both values had been pasted inside `< >`. The agent removed the brackets and checked each value's format, never printing either. The agent then added both to Vercel Preview and Production as sensitive variables and redeployed the S11 preview.
+  - The agent created a throwaway account `s11-preview-<random>@test.kalender.app` on the preview. Settings showed "Not connected".
+  - **Connect:** "Connect Google Calendar" opened Google's consent screen for the `calendar.events` scope. Abdul Hannan Rauf chose his account and allowed access himself. Kalender came back to Settings with "Connected" (S11-1, S11-2).
+  - **Add (AC-08.1):** the agent added a Manual Event, "S11 check: ISE quiz", on 30 Nov 2026 at 5:00 pm in Room C-201. Google Calendar showed one copy, 5 pm to 6 pm, in Room C-201. The Events list showed no failed mark.
+  - **Edit (AC-12.1):** changing the time to 6:30 pm in Kalender moved the copy to 6:30 pm to 7:30 pm.
+  - **Delete (AC-12.2):** deleting the Event in Kalender removed the copy from Google Calendar.
+  - **Unlink (AC-13.2):** the agent added a second Event, "S11 check: kept after unlink", at 10:00 am, and its copy appeared in Google. Unlink asked to confirm, with the line that copies already in Google stay. After Unlink, Settings showed "Not connected", and the copy was still in Google Calendar.
+  - Each copy and change was already in Google Calendar when the agent looked, 5 to 10 seconds after the action in Kalender.
+  - Not checked with the real account:
+    - "Calendar update failed" with Try again, because Google did not fail during the check. S11-8 covers it with the fake Google.
+    - The revoke at Google after Unlink, on the Google account's third-party connections page.
+
+| Not connected | Connected | Unlink, confirm | Unlinked |
+|---|---|---|---|
+| ![Not connected](S11/settings-not-connected.jpg) | ![Connected](S11/settings-connected.jpg) | ![Confirm](S11/settings-unlink-confirm.jpg) | ![Unlinked](S11/settings-unlinked.jpg) |
+
+| | Kalender | Google Calendar |
+|---|---|---|
+| Added | ![Added](S11/kalender-event-added.jpg) | ![Copy added](S11/google-copy-added.jpg) |
+| Edited to 6:30 pm | ![Edited](S11/kalender-event-edited.jpg) | ![Copy updated](S11/google-copy-updated.jpg) |
+| Deleted | ![Deleted](S11/kalender-event-deleted.jpg) | ![Copy removed](S11/google-copy-removed.jpg) |
+| After Unlink | | ![Copy kept](S11/google-copy-kept-after-unlink.jpg) |
