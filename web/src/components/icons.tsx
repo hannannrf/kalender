@@ -60,3 +60,29 @@ export const BellIcon = () => (
     <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
   </Icon>
 );
+
+export const SunIcon = () => (
+  <Icon>
+    <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+    <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
+  </Icon>
+);
+
+export const MoonIcon = () => (
+  <Icon>
+    <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+  </Icon>
+);
+
+export const PhoneIcon = () => (
+  <Icon>
+    <path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14z" />
+    <path d="M11 4h2" /><path d="M12 17v.01" />
+  </Icon>
+);
+
+export const PlusIcon = () => (
+  <Icon>
+    <path d="M12 5l0 14" /><path d="M5 12l14 0" />
+  </Icon>
+);

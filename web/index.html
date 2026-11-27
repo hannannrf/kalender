@@ -7,6 +7,8 @@
     <meta name="theme-color" content="#121412" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Kalender turns the WhatsApp Chat Exports you choose into reviewed Events with Reminders." />
     <title>Kalender</title>
+    <!-- S15: apply the saved Light or Dark choice before first paint (see src/theme.ts). -->
+    <script>try{var t=localStorage.getItem("kalender-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />

@@ -19,6 +19,9 @@
   --danger-fill: #b42318; /* Revoke and Delete buttons, with --on-colour text */
   --on-colour: #ffffff; /* text on a Chat colour, the badge or --danger-fill, in both modes */
   --placeholder: #e2e4df; /* loading placeholder cards (S14) */
+  --tint: 9%; /* how much Chat colour mixes into a Chat's card (S15) */
+  --shadow-card: 0 1px 2px rgb(23 24 26 / 0.05), 0 2px 10px rgb(23 24 26 / 0.05);
+  --shadow-raised: 0 8px 24px rgb(23 24 26 / 0.16);
   --chat-manual: #6b6f76;
   /* Approved Chat palette, assigned in approval order (architecture section 8). */
   --chat-1: #2457d6;
@@ -54,10 +57,34 @@
   --content-max: 640px;
 }
 
-/* Dark mode follows the phone's setting (S14, Gate 1 "Follow phone"). Same token names; every text pair is 4.5:1 or more
-   (values in evidence/slices/S14-polish-dark-mode.md). The Chat palette, the badge and the Uncertain mark keep their light values. */
+/* Dark mode (S14, S15): follows the phone unless the User picked Light or Dark in Settings, which sets data-theme on <html>.
+   Same token names; every text pair is 4.5:1 or more (values in the S14 and S15 evidence files).
+   The Chat palette, the badge and the Uncertain mark keep their light values. The two blocks below must stay identical. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ground: #121412;
+  --card: #1d201d;
+  --surface: #2b2f2a;
+  --line: #343833;
+  --text: #ecede9;
+  --muted: #a9aea3;
+  --primary: #ecede9;
+  --on-primary: #121412;
+  --check-bg: #33290a;
+  --check-ink: #fce38a;
+  --danger: #ff8b7e;
+  --danger-bg: #3b1a16;
+  --placeholder: #2b2f2a;
+  --tint: 18%;
+  --shadow-card: 0 0 0 1px rgb(255 255 255 / 0.04);
+  --shadow-raised: 0 8px 24px rgb(0 0 0 / 0.45);
+}
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
     --ground: #121412;
     --card: #1d201d;
     --surface: #2b2f2a;
@@ -71,5 +98,8 @@
     --danger: #ff8b7e;
     --danger-bg: #3b1a16;
     --placeholder: #2b2f2a;
+    --tint: 18%;
+    --shadow-card: 0 0 0 1px rgb(255 255 255 / 0.04);
+    --shadow-raised: 0 8px 24px rgb(0 0 0 / 0.45);
   }
 }

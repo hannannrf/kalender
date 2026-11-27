@@ -1,9 +1,11 @@
 // S00 placeholder screens. Each grows into its own file in the slice that fills it.
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { LEAD_MINUTES, leadText } from '../format';
+import { MoonIcon, PhoneIcon, SunIcon } from '../components/icons';
 import { pushState, turnOff, turnOn, type PushState } from '../push';
+import { applyTheme, savedTheme, type Theme } from '../theme';
 import { useSession } from '../session';
 import styles from './Page.module.css';
 
@@ -13,6 +15,44 @@ const dbText: Record<string, string> = {
   not_configured: 'Not set up yet',
   unreachable: 'Not reachable',
 };
+
+/** S15: Light, Dark, or the phone's own setting. Stored on this phone only, never sent to the server. */
+const themes: { value: Theme; label: string; icon: ReactNode }[] = [
+  { value: 'system', label: 'Phone', icon: <PhoneIcon /> },
+  { value: 'light', label: 'Light', icon: <SunIcon /> },
+  { value: 'dark', label: 'Dark', icon: <MoonIcon /> },
+];
+
+function Appearance() {
+  const [theme, setTheme] = useState(savedTheme);
+  return (
+    <section className={styles.rows} aria-labelledby="appearance-heading">
+      <h2 id="appearance-heading" className={styles.sectionTitle}>Appearance</h2>
+      <fieldset className={styles.choiceSet}>
+        <legend className={styles.label}>Look of Kalender on this phone</legend>
+        <div className={`${styles.segments} ${styles.three}`}>
+          {themes.map((t) => (
+            <label key={t.value} className={`${styles.segment} ${styles.iconSegment}`}>
+              <input
+                type="radio"
+                name="theme"
+                value={t.value}
+                checked={theme === t.value}
+                onChange={() => {
+                  setTheme(t.value);
+                  applyTheme(t.value);
+                }}
+              />
+              {t.icon}
+              <span>{t.label}</span>
+            </label>
+          ))}
+        </div>
+        <p className={styles.note}>Phone follows the light or dark setting of your phone.</p>
+      </fieldset>
+    </section>
+  );
+}
 
 /** FR-10, BR-19: the default Lead Time. A change moves every upcoming Reminder that uses the default. */
 function DefaultLeadTime() {
@@ -323,6 +363,7 @@ export function SettingsPage() {
           </button>
         </div>
       </section>
+      <Appearance />
       <DefaultLeadTime />
       <PhoneNotifications />
       <GoogleCalendar />
