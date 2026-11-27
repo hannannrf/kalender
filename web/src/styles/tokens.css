@@ -1,5 +1,6 @@
 /* Single source of design tokens (docs/design/ui-direction.md, D-24). Components use these, never raw hex. */
 :root {
+  color-scheme: light dark;
   --ground: #f3f4f2;
   --card: #ffffff;
   --surface: #e8eae6;
@@ -15,6 +16,9 @@
   --check-ink: #5a4300;
   --danger: #b42318;
   --danger-bg: #fdecea;
+  --danger-fill: #b42318; /* Revoke and Delete buttons, with --on-colour text */
+  --on-colour: #ffffff; /* text on a Chat colour, the badge or --danger-fill, in both modes */
+  --placeholder: #e2e4df; /* loading placeholder cards (S14) */
   --chat-manual: #6b6f76;
   /* Approved Chat palette, assigned in approval order (architecture section 8). */
   --chat-1: #2457d6;
@@ -48,4 +52,24 @@
   --bar-width: 5px;
   --target: 44px;
   --content-max: 640px;
+}
+
+/* Dark mode follows the phone's setting (S14, Gate 1 "Follow phone"). Same token names; every text pair is 4.5:1 or more
+   (values in evidence/slices/S14-polish-dark-mode.md). The Chat palette, the badge and the Uncertain mark keep their light values. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #121412;
+    --card: #1d201d;
+    --surface: #2b2f2a;
+    --line: #343833;
+    --text: #ecede9;
+    --muted: #a9aea3;
+    --primary: #ecede9;
+    --on-primary: #121412;
+    --check-bg: #33290a;
+    --check-ink: #fce38a;
+    --danger: #ff8b7e;
+    --danger-bg: #3b1a16;
+    --placeholder: #2b2f2a;
+  }
 }

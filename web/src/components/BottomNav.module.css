@@ -45,7 +45,7 @@
   padding: 0 5px;
   border-radius: 999px;
   background: var(--badge);
-  color: var(--on-primary);
+  color: var(--on-colour);
   font-size: 0.6875rem;
   font-weight: 700;
   line-height: 18px;

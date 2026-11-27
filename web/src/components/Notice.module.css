@@ -1,0 +1,23 @@
+.notice {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  max-width: calc(var(--content-max) - 2 * var(--space-4));
+  margin: 0 auto;
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius-control);
+  padding: var(--space-3) var(--space-4);
+  font-weight: 500;
+  z-index: 20;
+  animation: rise 0.2s ease-out;
+}
+
+/* Stops under prefers-reduced-motion through the rule in global.css (S14-8). */
+@keyframes rise {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}

@@ -19,6 +19,9 @@ export function dayHeader(date: string) {
   return near ?? dayText(date);
 }
 
+/** The date under an Aaj, Kal or Parson header (S14-1); null when the header already is the date. */
+export const dayHeaderDate = (date: string) => (dayHeader(date) === dayText(date) ? null : dayText(date));
+
 const sentFormat = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Asia/Karachi',
   weekday: 'short',

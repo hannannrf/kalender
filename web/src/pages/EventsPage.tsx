@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { EmptyState } from '../components/EmptyState';
-import { dayHeader, timeText } from '../format';
+import { Notice } from '../components/Notice';
+import { Placeholder } from '../components/Placeholder';
+import { dayHeader, dayHeaderDate, timeText } from '../format';
 import pageStyles from './Page.module.css';
 import styles from './InboxPage.module.css';
 
@@ -38,11 +40,8 @@ export function EventsPage() {
           Add Event
         </Link>
       </header>
-      {events === undefined && (
-        <p className={pageStyles.loading} role="status">
-          Loading your Events…
-        </p>
-      )}
+      <Notice />
+      {events === undefined && <Placeholder label="Loading your Events…" />}
       {events === 'error' && <p className={styles.problem}>Kalender could not load your Events. Check your connection and open it again.</p>}
       {Array.isArray(events) && events.length === 0 && (
         <EmptyState title="No upcoming Events">Confirm a Detected Event from your Inbox, or add one yourself with Add Event.</EmptyState>
@@ -52,6 +51,7 @@ export function EventsPage() {
           <section key={date} aria-labelledby={`day-${date}`} className={styles.group}>
             <h2 id={`day-${date}`} className={styles.chatName}>
               {dayHeader(date)}
+              {dayHeaderDate(date) && <span className={styles.headerDate}>{dayHeaderDate(date)}</span>}
             </h2>
             <ul className={styles.list}>
               {onDay.map((e) => (
@@ -59,7 +59,10 @@ export function EventsPage() {
                   <Link to={`/events/${e.id}`} className={styles.card} style={{ borderLeftColor: e.chat.colour ? `var(--chat-${e.chat.colour})` : 'var(--chat-manual)' }}>
                     <p className={styles.title}>{e.title}</p>
                     <p className={styles.when}>{e.time ? timeText(e.time) : 'All day'}</p>
-                    <p className={styles.place}>{[e.place, e.chat.name ?? 'Manual'].filter(Boolean).join(', ')}</p>
+                    <p className={styles.place}>
+                      <span className={styles.dot} style={{ background: e.chat.colour ? `var(--chat-${e.chat.colour})` : 'var(--chat-manual)' }} aria-hidden="true" />
+                      {[e.chat.name ?? 'Manual', e.place].filter(Boolean).join(', ')}
+                    </p>
                     {e.calendarFailed && <p className={styles.calendarFailed}>Calendar update failed</p>}
                   </Link>
                 </li>

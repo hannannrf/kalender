@@ -213,8 +213,8 @@
   min-height: 48px;
   border: 0;
   border-radius: var(--radius-control);
-  background: var(--danger);
-  color: var(--on-primary);
+  background: var(--danger-fill);
+  color: var(--on-colour);
   font: inherit;
   font-weight: 700;
   cursor: pointer;

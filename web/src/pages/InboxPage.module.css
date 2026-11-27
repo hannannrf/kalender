@@ -8,6 +8,25 @@
   overflow-wrap: anywhere;
 }
 
+/* Chat colour dot next to a Chat name (S14-2); the name is always written, so colour is never the only cue. */
+.dot {
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  margin-right: var(--space-2);
+  vertical-align: 0.05em;
+}
+
+/* The date under Aaj, Kal and Parson on the Events list (S14-1). */
+.headerDate {
+  margin-left: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--muted);
+}
+
 .list {
   list-style: none;
   margin: 0;

@@ -235,8 +235,8 @@
 }
 
 .yes {
-  background: var(--danger);
-  color: var(--on-primary);
+  background: var(--danger-fill);
+  color: var(--on-colour);
 }
 
 .revoke:focus-visible,
