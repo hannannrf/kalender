@@ -95,3 +95,18 @@ Contrast in dark mode, computed from the token values with the WCAG formula:
 The Chat colour bars and dots on the dark card are 2.5:1 to 3.3:1. They are decoration: the Chat name is always written next to them, so no meaning depends on the colour alone.
 
 Not checked: a real phone (only the in-app browser at phone size), reduced motion in a browser, and the Add Event and Edit Event forms in dark mode.
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 28 Nov 2026 ("Accept, merge and tag"). Reason: S14-1 to S14-6 pass on the screens checked, CI is green on PR #15 (S14-7), and the reduced-motion rule is in place (S14-8). Accepted with these known limits:
+- reduced motion was checked in code, not watched in a browser;
+- the screens were checked in the in-app browser at phone size, not on a real phone;
+- the Add Event and Edit Event forms were not looked at in dark mode.
+
+## 8. Integrate
+
+PR #15 merged into `main` with a merge commit, tagged `S14-accepted`; CI on `main` is Gate 4. The change is in `web/` only: two new components (`Placeholder`, `Notice`), token changes in `tokens.css`, and small page edits. No migration, no new dependency, no server change and no new Vercel variable.
+
+## 9. Context updated
+
+`plan.md` v15 (copy in `docs/plan-history/plan-v15.md`): S14 added as Accepted. Row 17 added to `evidence/workflow-evidence-log.md`.
