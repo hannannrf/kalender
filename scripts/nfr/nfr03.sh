@@ -17,24 +17,31 @@ vc /api/auth/register -o /dev/null -w "register %{http_code}\n" -X POST -H 'Cont
 echo "account $EMAIL"
 
 # First Reminder 3 minutes from now; Event = Reminder + 30 minutes (the default Lead Time). Times in PKT (UTC+5).
+# The tick loop starts first, so the early Reminders are ticked while the later Events are still being added.
 now=$(date +%s)
 first=$(( (now / 60 + 3) * 60 ))
+last=$(( first + (N - 1) * 60 ))
+echo "first reminder $(date -u -d "@$first" +%FT%TZ), last $(date -u -d "@$last" +%FT%TZ)"
+
+ticks() {
+  while :; do
+    local next=$(( ($(date +%s) / 60 + 1) * 60 + 2 ))
+    (( next > last + 120 )) && break
+    sleep $(( next - $(date +%s) ))
+    ( out=$(vercel curl "$DEP/internal/tick" -- -s -X POST -H "Authorization: Bearer $TICK_SECRET" -w ' %{http_code} %{time_total}s' 2>/dev/null)
+      echo "tick $(date -u -d "@$next" +%FT%TZ) $out" ) &
+  done
+  wait
+}
+ticks &
+
 for i in $(seq 0 $((N - 1))); do
   ev=$(( first + i * 60 + 30 * 60 + 5 * 3600 ))
   d=$(date -u -d "@$ev" +%F); t=$(date -u -d "@$ev" +%H:%M)
-  vc /api/events -o /dev/null -w "event $i $d $t %{http_code}\n" -X POST -H 'Content-Type: application/json' \
-    --data "{\"title\":\"NFR-03 check $((i + 1))\",\"date\":\"$d\",\"time\":\"$t\"}"
+  vc /api/events -o /dev/null -w "event $i $d $t %{http_code} at $(date -u +%T)
+" -X POST -H 'Content-Type: application/json'     --data "{\"title\":\"NFR-03 check $((i + 1))\",\"date\":\"$d\",\"time\":\"$t\"}"
 done
 
-last=$(( first + (N - 1) * 60 ))
-echo "first reminder $(date -u -d "@$first" +%FT%TZ), last $(date -u -d "@$last" +%FT%TZ)"
-while :; do
-  next=$(( ($(date +%s) / 60 + 1) * 60 + 2 ))
-  (( next > last + 120 )) && break
-  sleep $(( next - $(date +%s) ))
-  ( out=$(vercel curl "$DEP/internal/tick" -- -s -X POST -H "Authorization: Bearer $TICK_SECRET" -w ' %{http_code} %{time_total}s' 2>/dev/null)
-    echo "tick $(date -u -d "@$next" +%FT%TZ) $out" ) &
-done
 wait
 rm -f "$JAR"
 echo done
