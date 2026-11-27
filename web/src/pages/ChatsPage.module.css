@@ -179,8 +179,16 @@
   gap: 2px;
   background: var(--card);
   border-radius: var(--radius-card);
-  border-left: var(--bar-width) solid;
+  box-shadow: var(--shadow-card);
   padding: var(--space-3) var(--space-4);
+}
+
+/* S15: the Chat's initials on its colour, then its name. */
+.chatHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
 }
 
 .chatName {

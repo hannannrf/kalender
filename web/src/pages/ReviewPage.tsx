@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
+import { ChatAvatar, chatStyle } from '../components/ChatAvatar';
 import { EmptyState } from '../components/EmptyState';
 import { AlertIcon } from '../components/icons';
 import { dayText, sentText, timeText } from '../format';
@@ -191,10 +192,11 @@ export function ReviewPage() {
         Inbox
       </Link>
       <header className={styles.band} style={{ background: `var(--chat-${detail.chat.colour})` }}>
+        <ChatAvatar name={detail.chat.name} colour={detail.chat.colour} large />
         <h1 className={styles.chatName}>{detail.chat.name}</h1>
       </header>
 
-      <figure className={styles.quote}>
+      <figure className={styles.quote} style={chatStyle(detail.chat.colour)}>
         <figcaption>
           {detail.message.sender}, {sentText(detail.message.sentAt)}
         </figcaption>

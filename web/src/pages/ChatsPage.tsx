@@ -1,6 +1,7 @@
 // Approve a Chat from its export (FR-02, BR-15), list Approved Chats, update them (FR-03) and Revoke them (FR-04).
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { api, ApiError } from '../api';
+import { ChatAvatar } from '../components/ChatAvatar';
 import { FileUploadIcon } from '../components/icons';
 import { Placeholder } from '../components/Placeholder';
 import pageStyles from './Page.module.css';
@@ -311,9 +312,12 @@ function ChatRow({ chat, onUpdated, onRevoked }: { chat: Chat; onUpdated: (resul
 
   const titleId = `chat-${chat.id}`;
   return (
-    <li style={{ borderLeftColor: `var(--chat-${chat.colour})` }} aria-labelledby={titleId}>
-      <span id={titleId} className={styles.chatName}>
-        {chat.name}
+    <li aria-labelledby={titleId}>
+      <span className={styles.chatHead}>
+        <ChatAvatar name={chat.name} colour={chat.colour} />
+        <span id={titleId} className={styles.chatName}>
+          {chat.name}
+        </span>
       </span>
       <span className={styles.meta}>Approved {when.format(new Date(chat.approvedAt))}</span>
       <span className={styles.meta}>Last upload {when.format(new Date(chat.lastUploadAt))}</span>
