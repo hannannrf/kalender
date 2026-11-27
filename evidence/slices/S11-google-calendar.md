@@ -167,3 +167,19 @@ Known limits:
 | Edited to 6:30 pm | ![Edited](S11/kalender-event-edited.jpg) | ![Copy updated](S11/google-copy-updated.jpg) |
 | Deleted | ![Deleted](S11/kalender-event-deleted.jpg) | ![Copy removed](S11/google-copy-removed.jpg) |
 | After Unlink | | ![Copy kept](S11/google-copy-kept-after-unlink.jpg) |
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 27 Nov 2026 ("Accept, merge and tag"). Reason: criteria S11-1 to S11-11 pass in CI with a fake Google, and S11-12 passed with a real Google account on the deployed preview (connect, add, edit, delete and unlink). Accepted with these known limits:
+- "Calendar update failed" and the revoke at Google were not seen with the real account; S11-8 and S11-10 cover them with the fake Google;
+- Google keeps the app in Testing mode, so a link ends after 7 days and Settings asks to connect again;
+- a slow Google answer holds the confirm or edit request up to 5 seconds per call (decision 5);
+- retries run only when the tick runs (O-5).
+
+## 8. Integrate
+
+PR #12 merged into `main` with a merge commit, tagged `S11-accepted`; CI on `main` is Gate 4. Migration 008 runs on the production database at the production build. No new dependency. New Vercel variables: `TOKEN_ENCRYPTION_KEY`, `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in Preview and Production.
+
+## 9. Context updated
+
+`plan.md` v12 (copy in `docs/plan-history/plan-v12.md`): S11 Accepted, O-4 done. Architecture section 8 has the retention rows for Google tokens and copy records. Row 14 added to `evidence/workflow-evidence-log.md`.

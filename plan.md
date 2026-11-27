@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v11 (25 Nov 2026) |
+| Plan version | v12 (27 Nov 2026) |
+| Changes from v11 | S11 Accepted (Google Calendar copies through `fetch`, retries at +1, +5 and +15 minutes, "Calendar update failed", unlink; checked with a real Google account on the preview). O-4 done 27 Nov. Google keeps the app in Testing mode, so a link ends after 7 days |
 | Changes from v10 | S10 Accepted (web push through a hand-written service worker, installable PWA; checked on a real Android phone). Risk for S13: a large job backlog makes the tick slow from Vercel to Neon `dev`, and jobs run before Reminders. The Android share target is left out (S10 decision 8) |
 | Changes from v09 | S09 Accepted (delete the account and everything it owns; AFK build after one Gate 1 product question: the User types their password again). S11 must add `calendar-sync.deleteAllForUser` to account deletion and closes the Google token part of AC-13.3 |
 | Changes from v08 | S08 Accepted (Possible Duplicate with add, update or dismiss). It ran as HITL, not AFK, because Gate 1 needed a BR-13 reading (D-28: a missing place keeps the existing place). The calendar part of AC-06.4 stays with S11 |
@@ -36,7 +37,7 @@ Ship Kalender: a phone-first PWA where a student uploads WhatsApp Chat Exports, 
 | O-1 | Neon project and `DATABASE_URL` for `dev` and `main` branches (G-09) | Abdul Hannan Rauf | Done 23 Nov (Neon branches `dev` and `production`) |
 | O-2 | Vercel project linked to the GitHub repo, env vars set | Abdul Hannan Rauf | Done 23 Nov |
 | O-3 | One real Android and one real iPhone export, names replaced (G-06). iPhone: done 24 Nov (`fixtures/exports/real/`, names, links and roll numbers replaced). Android: still missing | Zain Amjad | Android before Gate 5 (S13); S05 accepted with the iPhone export only |
-| O-4 | Google Cloud OAuth client (Testing mode) | Zain Amjad | Before S11 |
+| O-4 | Google Cloud OAuth client (Testing mode) | Zain Amjad | Done 27 Nov (project "Kalender", Web client with the local, S11 preview and production redirect URIs; set up by Abdul Hannan Rauf) |
 | O-5 | cron-job.org job calling `/internal/tick` every minute | Abdul Hannan Rauf | Before Gate 5 (S13); S07 accepted without it on 24 Nov |
 | O-6 | NFR-04 session with Mahd and two classmates on 26 Nov (G-07) | Muhammad Areeb | S13 |
 | O-7 | Slice owners below are a proposal; the team confirms them | Team | Before S01 |
@@ -66,7 +67,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 | S08 | Possible Duplicate: add new, update existing, or dismiss | BR-04, BR-13 | 05.10, 06.4* | S04 | HITL | M | Thu 26 | Zain Amjad | Accepted | G1 G2 G3 pass |
 | S09 | Delete account and everything it owns | FR-13, MF-07 | 13.1, 13.3* | S07 | AFK | M | Thu 26 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S10 | Push notifications through the service worker; installable PWA | FR-09 (push), C-05 | 09.3 | S07 | HITL | S | Thu 26 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
-| S11 | Connect Google Calendar: one-way copies, retries, "Calendar update failed", unlink | FR-08, FR-13 (unlink), BR-09, BR-10, BR-18 | 08.1..08.3, 12.1, 12.2, 13.2, 13.3, 06.4 | S07 | HITL | S | Thu 26 | Zain Amjad | Planned | – |
+| S11 | Connect Google Calendar: one-way copies, retries, "Calendar update failed", unlink | FR-08, FR-13 (unlink), BR-09, BR-10, BR-18 | 08.1..08.3, 12.1, 12.2, 13.2, 13.3, 06.4 | S07 | HITL | S | Thu 26 | Zain Amjad | Accepted | G1 G2 G3 pass |
 | S12 | Upload nudge for stale Approved Chats (OQ-05, D-27) | new FR-14 | new AC-14.x | S07 | AFK | C | Thu 26 | Muhammad Areeb | Planned | – |
 | S13 | Polish, Gate 5 end-to-end run, NFR-02/03/04 evidence | NFR-02..04 | all | all | HITL | M | Thu 26 | Abdul Hannan Rauf | Planned | – |
 
