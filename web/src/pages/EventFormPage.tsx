@@ -16,6 +16,7 @@ type ConfirmedEvent = {
   time: string | null;
   place: string | null;
   reminder?: Reminder | null;
+  calendarFailed?: boolean; // GL-22, S11
 };
 type Reminder = {
   leadMinutes: number | null;
@@ -52,6 +53,7 @@ export function EventFormPage() {
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [reminderChoice, setReminderChoice] = useState('default');
+  const [calendar, setCalendar] = useState<'failed' | 'trying' | 'synced'>();
 
   useEffect(() => {
     if (!editing) return;
@@ -60,6 +62,7 @@ export function EventFormPage() {
         setEvent(e);
         setDraft(draftOf(e));
         if (e.reminder) setReminderChoice(choiceOf(e.reminder));
+        if (e.calendarFailed) setCalendar('failed');
       },
       (err) => setEvent(err instanceof ApiError && err.status === 404 ? 'gone' : 'error'),
     );
@@ -125,6 +128,13 @@ export function EventFormPage() {
         await api(`/events/${loaded.id}/reminder`, { method: 'PUT', body: reminder });
       }
     });
+  }
+
+  /** BR-10: a manual retry once the automatic ones are used up. */
+  async function retryCalendar(eventId: string) {
+    setCalendar('trying');
+    const answer = await api<{ calendar: string }>(`/calendar/retry/${eventId}`, { method: 'POST' }).catch(() => undefined);
+    setCalendar(answer?.calendar === 'synced' ? 'synced' : 'failed');
   }
 
   const error = (field: string) => errors[field] && <p className={styles.fieldError}>{errors[field]}</p>;
@@ -198,6 +208,23 @@ export function EventFormPage() {
           </div>
         )}
       </div>
+
+      {loaded && calendar && (
+        <div className={calendar === 'synced' ? own.calendarDone : own.calendarFailed} role="status">
+          {calendar === 'synced' ? (
+            <p>Google Calendar is up to date for this Event.</p>
+          ) : (
+            <>
+              <p>
+                <strong>Calendar update failed.</strong> This Event and its Reminder are safe in Kalender, but its copy in Google Calendar could not be updated.
+              </p>
+              <button type="button" className={styles.secondary} disabled={calendar === 'trying'} onClick={() => retryCalendar(loaded.id)}>
+                {calendar === 'trying' ? 'Trying again…' : 'Try again'}
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {problem && (
         <p className={styles.problem} role="alert">

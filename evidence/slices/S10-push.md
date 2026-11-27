@@ -156,6 +156,8 @@ Found and fixed after the phone check:
 
 PR #11 merged into `main` with a merge commit, tagged `S10-accepted`; CI on `main` is Gate 4. Migration 007 runs on the production database at the production build. New dependency: `web-push` 3.6.7 (server). New Vercel variables: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT` in Preview and Production.
 
+After merge: CI on `main` passed at `d1120b4`, and the Vercel deployment of that commit succeeded and is aliased to https://kalender-tan-eta.vercel.app. Its build log shows `migrate: applied 1 (007_reminders_create_push_subscriptions.sql)`. `/api/health` answers `{"status":"ok","db":"ok"}`, `/api/push/public-key` answers 401 when signed out, and `/manifest.webmanifest` and `/sw.js` answer 200.
+
 ## 9. Context updated
 
 `plan.md` v11 (copy in `docs/plan-history/plan-v11.md`): S10 Accepted, the tick-backlog risk added for S13. Architecture section 8 has the push subscription retention row. Row 13 added to `evidence/workflow-evidence-log.md`.

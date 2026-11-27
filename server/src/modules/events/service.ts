@@ -404,7 +404,18 @@ async function expireDetected(tx: Db, job: jobs.Job, now: Date): Promise<void> {
   await repo.deleteSourceMessageIfUnused(tx, userId, row.source_message_id);
 }
 
+// ---- Calendar backfill (BR-18, Q-3) ----
+
+/** On CalendarLinked: one EventResync per Upcoming Confirmed Event, so calendar-sync adds each copy that is missing. */
+async function resyncUpcoming(tx: Db, userId: string, now: Date): Promise<void> {
+  const { date, time } = pktParts(now);
+  for (const row of await repo.listUpcoming(tx, userId, date, time)) await jobs.publish(tx, { type: 'EventResync', payload: snapshot(userId, row, now) });
+}
+
 /** Called once by the composition root (Q-1). */
 export function register(registry: jobs.Registry): void {
   registry.registerHandler(EXPIRE, expireDetected);
+  registry.subscribe('CalendarLinked', 'events', async (tx, message, now) => {
+    if (message.type === 'CalendarLinked') await resyncUpcoming(tx, message.payload.userId, now);
+  });
 }

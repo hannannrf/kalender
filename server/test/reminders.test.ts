@@ -169,10 +169,10 @@ describe.skipIf(!hasDb)('Reminders (FR-09, FR-10)', () => {
     await Promise.all([tick(db(), T(11, 14, 30)), tick(db(), T(11, 14, 30, 30))]);
     expect(await notifications(agent)).toHaveLength(1);
     const deliveries = await db().query(
-      `select d.subscriber from outbox_deliveries d join outbox o on o.id = d.outbox_id where o.payload->>'eventId' = $1`,
+      `select d.subscriber from outbox_deliveries d join outbox o on o.id = d.outbox_id where o.payload->>'eventId' = $1 order by d.subscriber`,
       [made.id],
     );
-    expect(deliveries.rows).toEqual([{ subscriber: 'reminders' }]);
+    expect(deliveries.rows).toEqual([{ subscriber: 'calendar-sync' }, { subscriber: 'reminders' }]); // S11 added calendar-sync
   });
 
   it('S07-15 BR-11 two Users: no access to another User\'s Reminder or notification; limits are checked', async () => {

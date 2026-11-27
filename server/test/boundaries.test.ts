@@ -43,4 +43,12 @@ describe('module boundary lint rule', () => {
     expect(await errors("import { a } from '../detection';\nexport const x = a;\n", identityFile)).toBe(1);
     expect(await errors("import { a } from '../chats/repository';\nexport const x = a;\n", identityFile)).toBeGreaterThan(0);
   });
+
+  it('S11: calendar-sync may import only jobs; identity may import calendar-sync', async () => {
+    const calendarFile = resolve(__dirname, '../src/modules/calendar-sync/service.ts');
+    const identityFile = resolve(__dirname, '../src/modules/identity/service.ts');
+    expect(await errors("import { a } from '../jobs';\nexport const x = a;\n", calendarFile)).toBe(0);
+    expect(await errors("import { a } from '../events';\nexport const x = a;\n", calendarFile)).toBe(1);
+    expect(await errors("import { a } from '../calendar-sync';\nexport const x = a;\n", identityFile)).toBe(0);
+  });
 });

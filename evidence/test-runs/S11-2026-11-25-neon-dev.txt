@@ -1,0 +1,144 @@
+> lint
+> eslint .
+> typecheck
+> tsc -p server --noEmit && tsc -p web --noEmit && tsc -p api --noEmit
+> test
+> vitest run --root server --exclude test/calendar.test.ts && vitest run --root server test/calendar.test.ts
+[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (server/vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.[39m
+ RUN  v5.1.1 D:/ISE PROJECT/kalender/server
+stderr | test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-4 AC-09.4 BR-08 no Reminder when its time has passed at confirm or edit; the same minute still counts
+{"level":"error","where":"calendar-sync.push","name":"TypeError","code":"ERR_CRYPTO_INVALID_AUTH_TAG"}
+stderr | test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-4 AC-09.4 BR-08 no Reminder when its time has passed at confirm or edit; the same minute still counts
+{"level":"error","where":"calendar-sync.push","name":"TypeError","code":"ERR_CRYPTO_INVALID_AUTH_TAG"}
+stderr | test/account.test.ts > delete the account (FR-13, MF-07) > S09-2 AC-13.3, S09-3 BR-11: no row with the User's id is left in any table; another User keeps everything
+{"level":"error","where":"calendar-sync.revoke","name":"TypeError","code":"ERR_CRYPTO_INVALID_AUTH_TAG"}
+ ❯ test/account.test.ts (6 tests | 2 failed) 155300ms
+   ❯ delete the account (FR-13, MF-07) (6)
+     × S09-2 AC-13.3, S09-3 BR-11: no row with the User's id is left in any table; another User keeps everything 77141ms
+     × S09-5 R2-9: after only the first step the User is refused, and the queued job removes the rest; steps run twice safely 30015ms
+ ❯ test/reminders.test.ts (23 tests | 3 failed) 380708ms
+   ❯ Reminders (FR-09, FR-10) (12)
+     × S07-4 AC-09.4 BR-08 no Reminder when its time has passed at confirm or edit; the same minute still counts 11765ms
+     × S07-6 AC-10.1 after the default becomes 1 hour, a new Event is reminded 1 hour before (dispatched before the route answers) 7224ms
+     × S07-11 two ticks in the same minute present a Reminder once; each message reaches each subscriber once 14555ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  test/account.test.ts > delete the account (FR-13, MF-07) > S09-2 AC-13.3, S09-3 BR-11: no row with the User's id is left in any table; another User keeps everything
+AssertionError: expected { users: 1, sessions: 1, …(12) } to deeply equal { users: 1, sessions: 1, …(12) }
+- Expected
++ Received
+@@ -3,14 +3,14 @@
+    "calendar_copies": 3,
+    "calendar_links": 1,
+    "confirmed_events": 2,
+    "detected_events": 1,
+    "in_app_notifications": 1,
+-   "jobs": 5,
++   "jobs": 9,
+    "outbox": 2,
+    "push_subscriptions": 1,
+    "reminder_settings": 1,
+-   "reminders": 1,
++   "reminders": 2,
+    "sessions": 1,
+    "source_messages": 1,
+    "users": 1,
+  }
+ ❯ test/account.test.ts:94:38
+     92|     expect((await gone.agent.delete('/api/account').send({ password: P…
+     93|     expect(await rows(gone.userId)).toEqual(none);
+     94|     expect(await rows(other.userId)).toEqual(otherBefore);
+       |                                      ^
+     95|   }, 120_000); // seeds two Users with data of every kind; the Neon de…
+     96|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+ FAIL  test/account.test.ts > delete the account (FR-13, MF-07) > S09-5 R2-9: after only the first step the User is refused, and the queued job removes the rest; steps run twice safely
+TestTimeoutError: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ test/account.test.ts:122:3
+    120|   });
+    121|
+    122|   it('S09-5 R2-9: after only the first step the User is refused, and t…
+       |   ^
+    123|     const { agent, email, userId } = await fullUser();
+    124|     const now = new Date();
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-4 AC-09.4 BR-08 no Reminder when its time has passed at confirm or edit; the same minute still counts
+AssertionError: expected { status: 'scheduled', …(3) } to match object { status: 'sent', …(2) }
+(1 matching property omitted from actual)
+- Expected
++ Received
+  {
+-   "delivered_at": 2020-06-03T09:31:00.000Z,
++   "delivered_at": null,
+    "reminder_at": 2020-06-03T09:30:00.000Z,
+-   "status": "sent",
++   "status": "scheduled",
+  }
+ ❯ test/reminders.test.ts:85:43
+     83|     if (!('id' in sameMinute)) throw new Error('not created');
+     84|     await tick(db(), T(3, 14, 31));
+     85|     expect(await reminder(sameMinute.id)).toMatchObject({ status: 'sen…
+       |                                           ^
+     86|     expect(await reminder(await event(userId, { date: D(3), time: '15:…
+     87|     const edited = await event(userId, { title: 'Viva', date: D(3), ti…
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-6 AC-10.1 after the default becomes 1 hour, a new Event is reminded 1 hour before (dispatched before the route answers)
+AssertionError: expected null to match object { leadMinutes: null, …(2) }
+- Expected:
+{
+  "defaultLeadMinutes": 60,
+  "leadMinutes": null,
+  "status": "scheduled",
+}
++ Received:
+null
+ ❯ test/reminders.test.ts:109:32
+    107|     const made = await agent.post('/api/events').send({ title: 'Semina…
+    108|     const read = await agent.get(`/api/events/${made.body.id}`);
+    109|     expect(read.body.reminder).toMatchObject({ leadMinutes: null, defa…
+       |                                ^
+    110|     expect(read.body.reminder.reminderAt).toBe(pktToUtc(...(tomorrow.s…
+    111|   });
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+ FAIL  test/reminders.test.ts > Reminders (FR-09, FR-10) > S07-11 two ticks in the same minute present a Reminder once; each message reaches each subscriber once
+AssertionError: expected [ { subscriber: 'reminders' }, …(1) ] to deeply equal [ { subscriber: 'reminders' } ]
+- Expected
++ Received
+  [
+    {
+      "subscriber": "reminders",
+    },
++   {
++     "subscriber": "calendar-sync",
++   },
+  ]
+ ❯ test/reminders.test.ts:175:29
+    173|       [made.id],
+    174|     );
+    175|     expect(deliveries.rows).toEqual([{ subscriber: 'reminders' }]);
+       |                             ^
+    176|   });
+    177|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+ Test Files  2 failed | 13 passed (15)
+      Tests  5 failed | 196 passed | 2 skipped (203)
+   Start at  22:14:24
+   Duration  395.95s (tests 99%)
+> build
+> npm run migrate -w server && npm run build -w web
+> migrate
+> tsx src/migrate.ts
+migrate: applied 0 (none new)
+> build
+> vite build
+[36mvite v8.3.8 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 48 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.09 kB │ gzip:  0.53 kB
+dist/assets/index-h2YyhmeP.css   20.80 kB │ gzip:  4.01 kB
+dist/assets/index-Deoudj4h.js   311.18 kB │ gzip: 96.26 kB
+[32m✓ built in 609ms[39m

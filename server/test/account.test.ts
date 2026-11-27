@@ -4,7 +4,7 @@
 import request from 'supertest';
 import { afterAll, describe, expect, it } from 'vitest';
 import { app } from '../src/app';
-import type { Job, Registry } from '../src/modules/jobs';
+import { dispatchOutbox, type Job, type Registry } from '../src/modules/jobs';
 import { finishDeletion, register, requestDeletion } from '../src/modules/identity/service';
 import { closePool, db, withTransaction } from '../src/shared/db';
 import { pktParts } from '../src/shared/time';
@@ -14,7 +14,7 @@ afterAll(closePool);
 
 const PASSWORD = 'kal-5-baje-meeting';
 const SENT = new Date(Date.now() - 30 * 60_000);
-const OWNED = ['sessions', 'approved_chats', 'source_messages', 'detected_events', 'confirmed_events', 'reminders', 'reminder_settings', 'in_app_notifications', 'push_subscriptions', 'jobs', 'outbox'];
+const OWNED = ['sessions', 'approved_chats', 'source_messages', 'detected_events', 'confirmed_events', 'reminders', 'reminder_settings', 'in_app_notifications', 'push_subscriptions', 'calendar_links', 'calendar_copies', 'jobs', 'outbox'];
 
 /** One Android export line sent at SENT, in the 12-hour PKT format. */
 function line(text: string) {
@@ -52,6 +52,14 @@ async function fullUser() {
   expect((await u.agent.put('/api/settings/reminders').send({ defaultLeadMinutes: 60 })).status).toBe(200);
   const phone = { endpoint: `https://push.example.test/${u.userId}`, keys: { p256dh: 'BPublicKeyOfThisBrowser', auth: 'authSecret' } };
   expect((await u.agent.post('/api/push-subscriptions').send(phone)).status).toBe(201);
+  // Every outbox message of this User is dispatched now, so a late tick from another test file changes nothing after the snapshot
+  // (on the remote Neon dev branch the routes' own dispatch can miss them), and none reaches the calendar link below.
+  const pending = async () => Number((await db().query('select count(*) n from outbox where user_id = $1 and dispatched_at is null', [u.userId])).rows[0].n);
+  for (let i = 0; i < 10 && (await pending()) > 0; i++) await dispatchOutbox(db(), new Date(), { limit: 200, timeBudgetMs: 20_000 });
+  expect(await pending()).toBe(0);
+  // S11: a Linked Calendar and one copy. The token is not real ciphertext, so the best-effort revoke never reaches Google.
+  await db().query(`insert into calendar_links (user_id, refresh_token) values ($1, 'not-a-sealed-token')`, [u.userId]);
+  await db().query(`insert into calendar_copies (event_id, user_id, details) values (gen_random_uuid(), $1, null)`, [u.userId]);
   await db().query(
     `insert into in_app_notifications (user_id, event_id, title, date, reminder_at, kind) values ($1, gen_random_uuid(), 'Meeting', current_date, now(), 'due')`,
     [u.userId],

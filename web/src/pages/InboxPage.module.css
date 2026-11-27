@@ -99,3 +99,15 @@
   font-size: var(--text-md);
   font-weight: 500;
 }
+
+/* GL-22 (S11): the copy in Google Calendar could not be added, changed or removed. Words, not colour alone. */
+.calendarFailed {
+  justify-self: start;
+  margin-top: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: var(--text-md);
+  font-weight: 700;
+}

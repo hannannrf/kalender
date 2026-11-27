@@ -50,6 +50,16 @@ export default tseslint.config(
     },
   },
   {
+    // calendar-sync may use only jobs (AGENTS.md section 4).
+    files: ['server/src/modules/calendar-sync/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: [noDeepModuleImports, noIdentityImports, { regex: String.raw`^\.\./(?!\.\.|jobs(/index)?$)`, message: 'calendar-sync may use only jobs (AGENTS.md section 4).' }] },
+      ],
+    },
+  },
+  {
     // identity may use only the deleteAllForUser of these modules, plus jobs (AGENTS.md section 4).
     files: ['server/src/modules/identity/**/*.ts'],
     rules: {

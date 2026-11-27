@@ -1,4 +1,5 @@
 import express, { type ErrorRequestHandler } from 'express';
+import * as calendarSync from './modules/calendar-sync';
 import * as chats from './modules/chats';
 import * as events from './modules/events';
 import * as identity from './modules/identity';
@@ -16,6 +17,7 @@ app.use(express.json({ limit: '100kb' }));
 events.register(jobs);
 reminders.register(jobs);
 identity.register(jobs);
+calendarSync.register(jobs);
 
 app.get('/api/health', async (_req, res) => {
   const pool = getPool();
@@ -39,6 +41,7 @@ app.use('/api', identity.router);
 app.use('/api', chats.router);
 app.use('/api', events.router);
 app.use('/api', reminders.router);
+app.use('/api', calendarSync.router);
 
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'not_found' });

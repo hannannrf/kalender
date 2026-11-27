@@ -15,6 +15,9 @@ export type EventSnapshot = {
 export type OutboxMessage =
   | { type: 'EventConfirmed'; payload: EventSnapshot }
   | { type: 'EventUpdated'; payload: EventSnapshot }
-  | { type: 'EventDeleted'; payload: { eventId: string; userId: string } };
+  | { type: 'EventDeleted'; payload: { eventId: string; userId: string } }
+  // S11: calendar-sync publishes CalendarLinked; events answers with one EventResync per Upcoming Confirmed Event (BR-18, Q-3).
+  | { type: 'CalendarLinked'; payload: { userId: string } }
+  | { type: 'EventResync'; payload: EventSnapshot };
 
 export type OutboxType = OutboxMessage['type'];

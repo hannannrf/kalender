@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/dev.ts",
-    "test": "vitest run",
+    "test": "vitest run --exclude test/calendar.test.ts && vitest run test/calendar.test.ts",
     "migrate": "tsx src/migrate.ts"
   },
   "dependencies": {
