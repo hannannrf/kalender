@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Plan version | v13 (28 Nov 2026) |
+| Plan version | v14 (28 Nov 2026) |
+| Changes from v13 | S12 Cut (D-29, Mahd agreed); PRD v1.3 closes OQ-05 as not built. Every slice is now Accepted or Cut |
 | Changes from v12 | S13 Accepted with known gaps: Gate 5 passed on production; NFR-02 passed 20 of 20; NFR-03 run cut short at 29 of 50 (all 29 on time); NFR-04 not run (O-6). The tick now delivers Reminders before due jobs. O-5 done 28 Nov |
 | Changes from v11 | S11 Accepted (Google Calendar copies through `fetch`, retries at +1, +5 and +15 minutes, "Calendar update failed", unlink; checked with a real Google account on the preview). O-4 done 27 Nov. Google keeps the app in Testing mode, so a link ends after 7 days |
 | Changes from v10 | S10 Accepted (web push through a hand-written service worker, installable PWA; checked on a real Android phone). Risk for S13: a large job backlog makes the tick slow from Vercel to Neon `dev`, and jobs run before Reminders. The Android share target is left out (S10 decision 8) |
@@ -16,7 +17,7 @@
 | Changes from v02 | S02 Accepted; O-3 now needed before `ingestion` is accepted in S05 (S02 reads Android `.txt` only), one real iPhone export received |
 | Changes from v01 | AC-02.5 moved from S01 to S02 (the Approved Chats list arrives in S02); S01 Accepted; O-1 and O-2 done |
 | History | `docs/plan-history/plan-vNN.md` plus `git log -- plan.md` |
-| Context | `docs/PRD.md` v1.2, `docs/architecture.md` v1.3, `AGENTS.md`, `docs/adr/`, `docs/decisions.md` |
+| Context | `docs/PRD.md` v1.3, `docs/architecture.md` v1.3, `AGENTS.md`, `docs/adr/`, `docs/decisions.md` |
 | Deadline | Friday 27 Nov 2026 |
 | Plan owner | Abdul Hannan Rauf |
 
@@ -69,7 +70,7 @@ Priority: M = Must, S = Should, C = Could. Status: Planned, In progress, Accepte
 | S09 | Delete account and everything it owns | FR-13, MF-07 | 13.1, 13.3* | S07 | AFK | M | Thu 26 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S10 | Push notifications through the service worker; installable PWA | FR-09 (push), C-05 | 09.3 | S07 | HITL | S | Thu 26 | Muhammad Areeb | Accepted | G1 G2 G3 pass |
 | S11 | Connect Google Calendar: one-way copies, retries, "Calendar update failed", unlink | FR-08, FR-13 (unlink), BR-09, BR-10, BR-18 | 08.1..08.3, 12.1, 12.2, 13.2, 13.3, 06.4 | S07 | HITL | S | Thu 26 | Zain Amjad | Accepted | G1 G2 G3 pass |
-| S12 | Upload nudge for stale Approved Chats (OQ-05, D-27) | new FR-14 | new AC-14.x | S07 | AFK | C | Thu 26 | Muhammad Areeb | Planned | – |
+| S12 | Upload nudge for stale Approved Chats (OQ-05, D-27) | new FR-14 | new AC-14.x | S07 | AFK | C | Thu 26 | Muhammad Areeb | Cut (D-29) | – |
 | S13 | Polish, Gate 5 end-to-end run, NFR-02/03/04 evidence | NFR-02..04 | all | all | HITL | M | Thu 26 | Abdul Hannan Rauf | Accepted | G1 G2 G3 pass; G5 pass |
 
 `*` The calendar part of that AC is closed in S11.
