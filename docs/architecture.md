@@ -182,11 +182,11 @@ If any step fails, the transaction rolls back and the pointers do not move, so t
 
 `POST /internal/tick` → constant-time secret check → `jobs.tick(now)`. In order:
 1. **Outbox dispatch first:** each subscriber runs once per message, recorded in `outbox_deliveries`. This way a pending `EventDeleted` or `EventUpdated` cancels or moves a Reminder **before** it can be sent (AC-09.2, AC-12.1).
-2. **Due jobs:** up to 50, such as `calendarRetry`, `expireDetected`, `expireNeedsDate` and `resumeAccountDeletion`.
-3. **Tick tasks:**
+2. **Tick tasks:**
    - `reminders.deliverDue` re-reads each Reminder's status when claiming it, and includes Reminders up to 10 minutes overdue, marked late;
    - `identity.purgeExpiredSessions`;
    - housekeeping, which purges processed jobs and outbox rows older than 7 days.
+3. **Due jobs:** up to 50 within 20 seconds, such as `calendarRetry`, `expireDetected`, `expireNeedsDate` and `resumeAccountDeletion`. They run after the tick tasks, so a backlog of jobs never delays Reminders (NFR-03; changed in S13).
 
 Every step is batched, uses `FOR UPDATE SKIP LOCKED`, and is safe to run twice.
 
