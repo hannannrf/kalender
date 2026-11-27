@@ -95,3 +95,57 @@ Production at `bc30573` (S11 merge, before the S13 tick fix). Abdul Hannan Rauf 
 Found during Gate 5 (not blocking, so known issues per S13-6):
 - **O-5 matters on production.** After Connect, Meeting and the reminder Event reached Google at once, but OOP lab waited in the outbox: the callback sends the copies for at most 4 seconds per pass, and production has no per-minute tick yet. The next manual tick sent it. Reminders on production likewise need the tick. cron-job.org (O-5) must be set up before the NFR-04 session.
 - **Production is slow.** Confirming an Event or loading the Events list took about 5 to 10 seconds, from the Vercel function to the Neon production branch. This is the open Vercel region question from S10.
+
+### S13-2, NFR-02 on the S13 preview (28 Nov 2026)
+
+Preview `kalender-mwok9x4cv` at `ad0baf1`, Neon `dev`, one throwaway account. The 20 exports were made just before the run, so their 300 recent lines fall inside the 7-day Look-back. Full table: `evidence/slices/S13/nfr02-report.md`.
+
+| Measure | Result |
+|---|---|
+| Uploads answered 201 | 20 of 20 |
+| Time from upload start to the Detected Events list (upload plus list request) | 32.9 to 42.4 seconds, all within 60 seconds |
+| Messages read per upload | 254 to 271 of the 300 recent lines; the rest are "<Media omitted>" and "This message was deleted", which Kalender does not read (34 of them in Chat 01, which read 266) |
+| Detected Events per upload | 41 to 55 |
+
+**Result: pass, 20 of 20 within 60 seconds (NFR-02 needs 19 of 20).** About 95% of each time is the upload request, which reads and stores the Chat and runs detection; the list request takes 1 to 3.5 seconds. The Detected Events count is higher than the 30 Event messages in each file, because some chatter lines such as "sir aaj late aayenge" are also detected. Detection accuracy is NFR-05's job, not this check's.
+
+A first try at 1:30 am on 28 Nov used exports made the day before; one upload ran (33.4 seconds) before the agent stopped it to make fresh exports.
+
+### S13-3, NFR-03 on the S13 preview (27 Nov 2026)
+
+Preview `kalender-6vcebd3eq` (with the tick fix), Neon `dev`, one throwaway account, 50 Manual Events whose Reminders fell one per minute from 11:48 to 12:37 UTC. `scripts/nfr/nfr03.sh` on this PC called the tick at 2 seconds past each minute. Lateness is measured from `in_app_notifications.created_at`. Full table: `evidence/slices/S13/nfr03-report.md`.
+
+| Measure | Result |
+|---|---|
+| Reminders presented | 29 of 50 (Reminders 1 to 29) |
+| Late by, for the 29 presented | 6.9 to 10.4 seconds, median 9.0 seconds; none early, none after 60 seconds |
+| Reminders 30 to 50 | still scheduled: the tick script stopped at about 12:15 UTC, when the agent session on this PC ended |
+
+**Result: not fully checked.** All 29 Reminders that a tick reached were on time (100% of those), but the run covers 29 of the planned 50. Against the planned 50 it is 58%, below the 98% that NFR-03 needs. Abdul Hannan Rauf chose on 28 Nov to record the 29 as they are and not to run the 55-minute check again ("Record 29 as is"). What the run shows is that a Reminder is presented within one tick of its Reminder Time when the tick runs every minute. What it cannot show is whether the tick runs every minute for a week on production; that depends on cron-job.org (O-5), which is not set up yet.
+
+### S13-4, NFR-04 (not run yet)
+
+The run sheet is ready (`evidence/slices/S13/nfr04-run-sheet.md`). The session with Mahd and two classmates has not been run, so NFR-04 is not checked. It also needs O-5 on production first, because Reminders and Google copies on production wait for the tick (see Gate 5).
+
+### S13-5, NFR-01 and NFR-05 in CI
+
+CI on `main` at `bc30573` (S11 merge) and on each S13 commit (last `ad0baf1`) passed. The run includes `chats.test.ts` (13 tests, among them the NFR-01 check that no message text or sender is stored for the Chat, only fingerprints) and `nfr05.gate.test.ts` (9 tests, with the 80 of 80 detection gate and the `evaluate.py` re-score). **Result: pass.**
+
+### S13-6, problems found
+
+No problem blocked a User, so no product code changed in S13 except the tick order (section 5), which changed what the NFR-03 run measures. Known issues:
+1. O-5: production has no per-minute tick, so Reminders, retries and some Google copies wait. This must be set up before Kalender is used for real and before the NFR-04 session.
+2. Production responses take about 5 to 10 seconds (Vercel function to the Neon production branch).
+3. O-3: no real Android export was checked; the Android format is covered by the sample and generated exports.
+4. NFR-03 covers 29 Reminders over 29 minutes, not 50 over a week.
+
+### Summary
+
+| Criterion | Result |
+|---|---|
+| S13-1 Gate 5 on production | pass |
+| S13-2 NFR-02 | pass, 20 of 20 |
+| S13-3 NFR-03 | not fully checked: 29 of 29 ticked on time, 29 of 50 run |
+| S13-4 NFR-04 | not run |
+| S13-5 NFR-01, NFR-05 | pass |
+| S13-6 | done, 4 known issues |

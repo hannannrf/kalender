@@ -180,6 +180,8 @@ Known limits:
 
 PR #12 merged into `main` with a merge commit, tagged `S11-accepted`; CI on `main` is Gate 4. Migration 008 runs on the production database at the production build. No new dependency. New Vercel variables: `TOKEN_ENCRYPTION_KEY`, `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in Preview and Production.
 
+After the merge (checked 27 Nov 2026, added in S13): CI on `main` passed at `bc30573` and the production deployment is Ready. Its build log shows `migrate: applied 1 (008_calendar_sync_create_links_and_copies.sql)`. On production, `/api/health` answers ok and `/api/calendar` answers 401 when signed out. The Gate 5 run in S13 connected a real Google account on production and saw the copies arrive.
+
 ## 9. Context updated
 
 `plan.md` v12 (copy in `docs/plan-history/plan-v12.md`): S11 Accepted, O-4 done. Architecture section 8 has the retention rows for Google tokens and copy records. Row 14 added to `evidence/workflow-evidence-log.md`.
