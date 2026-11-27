@@ -9,7 +9,7 @@
 | Mode | HITL: the deployed product, a real Google account, and a usability session with real people |
 | Agent | Claude Code (Opus 5.5) |
 | Branch | `slice/S13-final-check` |
-| Date | 27 Nov 2026 |
+| Date | 27 to 28 Nov 2026 |
 
 ## 1. Select
 
@@ -121,11 +121,11 @@ Preview `kalender-6vcebd3eq` (with the tick fix), Neon `dev`, one throwaway acco
 | Late by, for the 29 presented | 6.9 to 10.4 seconds, median 9.0 seconds; none early, none after 60 seconds |
 | Reminders 30 to 50 | still scheduled: the tick script stopped at about 12:15 UTC, when the agent session on this PC ended |
 
-**Result: not fully checked.** All 29 Reminders that a tick reached were on time (100% of those), but the run covers 29 of the planned 50. Against the planned 50 it is 58%, below the 98% that NFR-03 needs. Abdul Hannan Rauf chose on 28 Nov to record the 29 as they are and not to run the 55-minute check again ("Record 29 as is"). What the run shows is that a Reminder is presented within one tick of its Reminder Time when the tick runs every minute. What it cannot show is whether the tick runs every minute for a week on production; that depends on cron-job.org (O-5), which is not set up yet.
+**Result: not fully checked.** All 29 Reminders that a tick reached were on time (100% of those), but the run covers 29 of the planned 50. Against the planned 50 it is 58%, below the 98% that NFR-03 needs. Abdul Hannan Rauf chose on 28 Nov to record the 29 as they are and not to run the 55-minute check again ("Record 29 as is"). What the run shows is that a Reminder is presented within one tick of its Reminder Time when the tick runs every minute. What it cannot show is whether the tick runs every minute for a week on production; that depends on cron-job.org (O-5), which was set up only on 28 Nov.
 
-### S13-4, NFR-04 (not run yet)
+### S13-4, NFR-04 (not run)
 
-The run sheet is ready (`evidence/slices/S13/nfr04-run-sheet.md`). The session with Mahd and two classmates has not been run, so NFR-04 is not checked. It also needs O-5 on production first, because Reminders and Google copies on production wait for the tick (see Gate 5).
+The run sheet is ready (`evidence/slices/S13/nfr04-run-sheet.md`). The session with Mahd and two classmates was not run before the deadline, so NFR-04 is not checked. On 28 Nov 2026 Abdul Hannan Rauf chose to accept S13 with NFR-04 recorded as not run, rather than wait for the session. No usability results are claimed for Kalender. The run sheet stays in the repository so that the session can be run later on production, which now has its per-minute tick (O-5).
 
 ### S13-5, NFR-01 and NFR-05 in CI
 
@@ -134,10 +134,11 @@ CI on `main` at `bc30573` (S11 merge) and on each S13 commit (last `ad0baf1`) pa
 ### S13-6, problems found
 
 No problem blocked a User, so no product code changed in S13 except the tick order (section 5), which changed what the NFR-03 run measures. Known issues:
-1. O-5: production has no per-minute tick, so Reminders, retries and some Google copies wait. This must be set up before Kalender is used for real and before the NFR-04 session.
+1. O-5 was open during Gate 5: production had no per-minute tick, so Reminders, retries and one Google copy waited. Abdul Hannan Rauf set up the cron-job.org job on 28 Nov 2026 at about 1:19 am PKT: a POST to `/internal/tick` every minute with the secret header. Its first run answered 200 OK in 10.6 seconds, 13 seconds after the minute (cron-job.org spreads its start times). Only that first run was checked by the agent.
 2. Production responses take about 5 to 10 seconds (Vercel function to the Neon production branch).
 3. O-3: no real Android export was checked; the Android format is covered by the sample and generated exports.
 4. NFR-03 covers 29 Reminders over 29 minutes, not 50 over a week.
+5. NFR-04 was not run, so the five-minute first-use target has no evidence.
 
 ### Summary
 
@@ -146,6 +147,22 @@ No problem blocked a User, so no product code changed in S13 except the tick ord
 | S13-1 Gate 5 on production | pass |
 | S13-2 NFR-02 | pass, 20 of 20 |
 | S13-3 NFR-03 | not fully checked: 29 of 29 ticked on time, 29 of 50 run |
-| S13-4 NFR-04 | not run |
+| S13-4 NFR-04 | not run (decision 28 Nov) |
 | S13-5 NFR-01, NFR-05 | pass |
-| S13-6 | done, 4 known issues |
+| S13-6 | done, 5 known issues |
+
+## 7. Human decision
+
+**Accept**, Abdul Hannan Rauf, 28 Nov 2026 (option 2: "Accept S13 with NFR-04 not run"). Reason: Gate 5 passed on production, NFR-02 passed 20 of 20, and NFR-01 and NFR-05 pass in CI. Accepted with these known gaps:
+- NFR-03 is not fully checked: the 29 Reminders that a tick reached were all on time, but the run stopped at 29 of 50 ("Record 29 as is", 28 Nov);
+- NFR-04 is not run, so no usability result is claimed;
+- O-3 (a real Android export) stays open;
+- production responses take about 5 to 10 seconds.
+
+## 8. Integrate
+
+PR #13 merged into `main` with a merge commit, tagged `S13-accepted`; CI on `main` is Gate 4. The only product change is the tick order in `server/src/modules/jobs/service.ts`, with test S13-3. No migration, no new dependency and no new Vercel variable. The rest of the slice is scripts under `scripts/nfr/` and `server/scripts/`, evidence and screenshots. O-5 is now done: cron-job.org calls the production tick every minute.
+
+## 9. Context updated
+
+`plan.md` v13 (copy in `docs/plan-history/plan-v13.md`): S13 Accepted, O-5 done, O-6 not run. Architecture section 6.3 has the new tick order. Row 15 added to `evidence/workflow-evidence-log.md`. The S11 evidence section 8 has the production check made after the S11 merge.
