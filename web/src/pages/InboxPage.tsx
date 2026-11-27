@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { EmptyState } from '../components/EmptyState';
+import { Notice } from '../components/Notice';
+import { Placeholder } from '../components/Placeholder';
 import { AlertIcon } from '../components/icons';
 import { dayText, timeText } from '../format';
 import pageStyles from './Page.module.css';
@@ -75,11 +77,8 @@ export function InboxPage() {
   return (
     <main className={pageStyles.page}>
       <h1 className={pageStyles.title}>Inbox</h1>
-      {events === undefined && (
-        <p className={pageStyles.loading} role="status">
-          Loading your Inbox…
-        </p>
-      )}
+      <Notice />
+      {events === undefined && <Placeholder label="Loading your Inbox…" />}
       {events === 'error' && <p className={styles.problem}>Kalender could not load your Inbox. Check your connection and open it again.</p>}
       {Array.isArray(events) && events.length === 0 && (
         <EmptyState title="Nothing to check">
@@ -90,6 +89,7 @@ export function InboxPage() {
         groupByChat(events).map(({ chat, events: inChat }) => (
           <section key={chat.id} aria-labelledby={`chat-${chat.id}`} className={styles.group}>
             <h2 id={`chat-${chat.id}`} className={styles.chatName}>
+              <span className={styles.dot} style={{ background: `var(--chat-${chat.colour})` }} aria-hidden="true" />
               {chat.name}
             </h2>
             <ul className={styles.list}>

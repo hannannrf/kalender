@@ -20,7 +20,7 @@
 .band {
   border-radius: var(--radius-card);
   padding: var(--space-4);
-  color: var(--on-primary);
+  color: var(--on-colour);
 }
 
 .chatName {
@@ -37,7 +37,8 @@
 .quote blockquote {
   margin: 0;
   background: var(--card);
-  border-radius: var(--radius-card) var(--radius-card) var(--radius-card) 4px;
+  border-radius: 4px var(--radius-card) var(--radius-card) var(--radius-card);
+  border: 1px solid var(--line);
   padding: var(--space-3) var(--space-4);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -95,6 +96,7 @@
   background: var(--uncertain-mark);
   color: var(--uncertain-ink);
   border-color: var(--uncertain-ink);
+  color-scheme: light; /* the picker icon stays dark on the light mark in dark mode (S14) */
 }
 
 .timeRow {

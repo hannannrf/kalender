@@ -154,7 +154,7 @@ export function ReviewPage() {
   const confirmEvent = () =>
     saveThen(async (d) => {
       await api(`/detected-events/${d.id}/confirm`, { method: 'POST' });
-      navigate('/events');
+      navigate('/events', { state: { notice: `${d.title} confirmed` } });
     });
 
   // BR-13: a Confirmed Event moves (the Events list then shows it); an older Detected Event leaves, and this one stays to confirm.
@@ -173,7 +173,7 @@ export function ReviewPage() {
     setBusy(true);
     try {
       await api(`/detected-events/${detail.id}/dismiss`, { method: 'POST' });
-      navigate('/');
+      navigate('/', { state: { notice: `${detail.title} dismissed` } });
     } catch {
       setProblem('Kalender could not reach the server. Try again.');
       setBusy(false);
@@ -195,10 +195,10 @@ export function ReviewPage() {
       </header>
 
       <figure className={styles.quote}>
-        <blockquote>{detail.message.text}</blockquote>
         <figcaption>
           {detail.message.sender}, {sentText(detail.message.sentAt)}
         </figcaption>
+        <blockquote>{detail.message.text}</blockquote>
       </figure>
 
       {dup && (

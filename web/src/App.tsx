@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BottomNav } from './components/BottomNav';
 import { EmptyState } from './components/EmptyState';
+import { Placeholder } from './components/Placeholder';
 import { ReminderCards } from './components/ReminderCards';
 import { AuthPage } from './pages/AuthPage';
 import { ChatsPage } from './pages/ChatsPage';
@@ -15,7 +16,12 @@ import { useSession } from './session';
 export function App() {
   const session = useSession();
 
-  if (session.status === 'loading') return null;
+  if (session.status === 'loading')
+    return (
+      <main className={pageStyles.page}>
+        <Placeholder label="Opening Kalender…" />
+      </main>
+    );
 
   if (session.status === 'offline') {
     return (

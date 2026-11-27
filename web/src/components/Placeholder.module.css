@@ -1,0 +1,32 @@
+.list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-2);
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border-left: var(--bar-width) solid var(--placeholder);
+  padding: var(--space-4);
+}
+
+.line {
+  height: 0.75rem;
+  width: 60%;
+  border-radius: 6px;
+  background: var(--placeholder);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.short {
+  width: 35%;
+}
+
+/* Stops under prefers-reduced-motion through the rule in global.css (S14-8). */
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}

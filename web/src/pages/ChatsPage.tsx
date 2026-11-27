@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { api, ApiError } from '../api';
 import { FileUploadIcon } from '../components/icons';
+import { Placeholder } from '../components/Placeholder';
 import pageStyles from './Page.module.css';
 import styles from './ChatsPage.module.css';
 
@@ -235,6 +236,7 @@ export function ChatsPage() {
         </section>
       )}
 
+      {chats === undefined && <Placeholder label="Loading your Approved Chats…" cards={2} />}
       {chats === 'error' && <p className={styles.problem}>Your Approved Chats could not be loaded.</p>}
       {Array.isArray(chats) && chats.length > 0 && (
         <section aria-labelledby="approved-title">
